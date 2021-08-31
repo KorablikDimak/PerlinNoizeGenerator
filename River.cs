@@ -26,7 +26,7 @@ namespace PerlyNoizeGenerator
             Vector2Int preferPosition = FindLowest(startPosition.x, startPosition.y, noiseMap);
             FindPathToWater(startPosition, preferPosition, noiseMap, waterLevel);
 
-            if (Positions.Count <= 10) return false;
+            if (Positions.Count <= 25) return false;
             DigRiver();
             return true;
         }
