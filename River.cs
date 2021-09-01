@@ -26,57 +26,55 @@ namespace PerlyNoizeGenerator
             Vector2Int preferPosition = FindLowest(startPosition.x, startPosition.y, noiseMap);
             FindPathToWater(startPosition, preferPosition, noiseMap, waterLevel);
 
-            if (Positions.Count <= 25) return false;
-            DigRiver();
-            return true;
+            return Positions.Count > 25;
         }
 
-        private void DigRiver()
+        public static void DigRiver(River river)
         {
-            int countBeforeDigging = Positions.Count;
+            int countBeforeDigging = river.Positions.Count;
             for (int i = countBeforeDigging - 1; i >= countBeforeDigging / 1.6; i--)
             {
-                Vector2Int direction = Positions[i] - Positions[i - 1];
+                Vector2Int direction = river.Positions[i] - river.Positions[i - 1];
 
                 if (direction == Vector2Int.down || direction == Vector2Int.up)
                 {
-                    Positions.Add(new Vector2Int(Positions[i].x + 1, Positions[i].y));
-                    IsRiverHere[Positions[i].x + 1, Positions[i].y] = true;
-                    Positions.Add(new Vector2Int(Positions[i].x - 1, Positions[i].y));
-                    IsRiverHere[Positions[i].x - 1, Positions[i].y] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x + 1, river.Positions[i].y));
+                    river.IsRiverHere[river.Positions[i].x + 1, river.Positions[i].y] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x - 1, river.Positions[i].y));
+                    river.IsRiverHere[river.Positions[i].x - 1, river.Positions[i].y] = true;
                 }
                 else if (direction == Vector2Int.left || direction == Vector2Int.right)
                 {
-                    Positions.Add(new Vector2Int(Positions[i].x, Positions[i].y + 1));
-                    IsRiverHere[Positions[i].x, Positions[i].y + 1] = true;
-                    Positions.Add(new Vector2Int(Positions[i].x, Positions[i].y - 1));
-                    IsRiverHere[Positions[i].x, Positions[i].y - 1] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x, river.Positions[i].y + 1));
+                    river.IsRiverHere[river.Positions[i].x, river.Positions[i].y + 1] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x, river.Positions[i].y - 1));
+                    river.IsRiverHere[river.Positions[i].x, river.Positions[i].y - 1] = true;
                 }
             }
 
             for (int i = (int) (countBeforeDigging / 1.6); i >= countBeforeDigging / 3; i--)
             {
-                Vector2Int direction = Positions[i] - Positions[i - 1];
+                Vector2Int direction = river.Positions[i] - river.Positions[i - 1];
                 
                 if (direction == Vector2Int.down)
                 {
-                    Positions.Add(new Vector2Int(Positions[i].x + 1, Positions[i].y));
-                    IsRiverHere[Positions[i].x + 1, Positions[i].y] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x + 1, river.Positions[i].y));
+                    river.IsRiverHere[river.Positions[i].x + 1, river.Positions[i].y] = true;
                 }
                 else if (direction == Vector2Int.up)
                 {
-                    Positions.Add(new Vector2Int(Positions[i].x - 1, Positions[i].y));
-                    IsRiverHere[Positions[i].x - 1, Positions[i].y] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x - 1, river.Positions[i].y));
+                    river.IsRiverHere[river.Positions[i].x - 1, river.Positions[i].y] = true;
                 }
                 else if (direction == Vector2Int.left)
                 {
-                    Positions.Add(new Vector2Int(Positions[i].x, Positions[i].y + 1));
-                    IsRiverHere[Positions[i].x, Positions[i].y + 1] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x, river.Positions[i].y + 1));
+                    river.IsRiverHere[river.Positions[i].x, river.Positions[i].y + 1] = true;
                 }
                 else if (direction == Vector2Int.right)
                 {
-                    Positions.Add(new Vector2Int(Positions[i].x, Positions[i].y - 1));
-                    IsRiverHere[Positions[i].x, Positions[i].y - 1] = true;
+                    river.Positions.Add(new Vector2Int(river.Positions[i].x, river.Positions[i].y - 1));
+                    river.IsRiverHere[river.Positions[i].x, river.Positions[i].y - 1] = true;
                 }
             }
         }

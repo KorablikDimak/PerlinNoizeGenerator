@@ -27,7 +27,7 @@ namespace PerlyNoizeGenerator
             Giant
         }
         
-        public void Update()
+        private void Update()
         {
             if (autoUpdate && _mapSizeX * _mapSizeY <= 300 * 300 && !noiseMapRenderer.rivers)
             {
@@ -51,6 +51,10 @@ namespace PerlyNoizeGenerator
                 case MapSize.Medium:
                     _mapSizeX = 300;
                     _mapSizeY = 300;
+                    scale = 5;
+                    octaves = 20;
+                    lacunarity = 0.72f;
+                    persistance = 1;
                     break;
                 case MapSize.Large:
                     _mapSizeX = 500;

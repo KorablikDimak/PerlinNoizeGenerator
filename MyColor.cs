@@ -4,9 +4,9 @@ namespace PerlyNoizeGenerator
 {
     public readonly struct MyColor
     {
-        public float Level { get; }
-        public Color32 Color { get; }
-        
+        public readonly float Level;
+        public readonly Color32 Color;
+
         public MyColor(float level, Color32 color)
         {
             Level = level;

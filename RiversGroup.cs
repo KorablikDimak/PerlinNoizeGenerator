@@ -10,48 +10,41 @@ namespace PerlyNoizeGenerator
 
         public static List<RiversGroup> BuildRiversGroups(List<River> rivers)
         {
-            List<RiversGroup> riversGroups = new List<RiversGroup>();
-            
+            var riversGroups = new List<RiversGroup>();
+
             while (rivers.Count > 0)
             {
-                RiversGroup riversGroup = new RiversGroup();
-                riversGroup.GroupOfRivers.Add(rivers[0]);
-                rivers.RemoveAt(0);
-
-                if (rivers.Count > 0)
-                {
-                    for (int i = rivers.Count - 1; i >= 0; i--)
-                    {
-                        foreach (var riverInGroup in riversGroup.GroupOfRivers)
-                        {
-                            foreach (var position in rivers[i].Positions)
-                            {
-                                if (riverInGroup.Positions.Any(positionInGroup => IsNeighbors(position, positionInGroup)))
-                                {
-                                    riversGroup.GroupOfRivers.Add(rivers[i]);
-                                    rivers.RemoveAt(i);
-                                }
-
-                                break;
-                            }
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    riversGroups.Add(riversGroup);
-                    return riversGroups;
-                }
+                var riversGroup = new RiversGroup();
+                var river = rivers[rivers.Count - 1];
+                riversGroup.GroupOfRivers.Add(river);
+                rivers.Remove(river);
+                ContainRivers(riversGroup, rivers, river);
                 riversGroups.Add(riversGroup);
             }
 
             return riversGroups;
         }
 
-        private static bool IsNeighbors(Vector2Int position, Vector2Int positionInGroup)
+        private static void ContainRivers(RiversGroup riversGroup, List<River> rivers, River river)
         {
-            return Vector2Int.Distance(position, positionInGroup) <= 4f;
+            foreach (var firstPosition in river.Positions)
+            {
+                for (int i = rivers.Count - 1; i >= 0; i--)
+                {
+                    if (!rivers[i].Positions.Any(secondPosition => IsNeighbors(firstPosition, secondPosition)))
+                        continue;
+                    var newRiver = rivers[i];
+                    riversGroup.GroupOfRivers.Add(newRiver);
+                    rivers.Remove(newRiver);
+                    ContainRivers(riversGroup, rivers, newRiver);
+                    return;
+                }
+            }
+        }
+
+        private static bool IsNeighbors(Vector2Int firstPosition, Vector2Int secondPosition)
+        {
+            return Vector2Int.Distance(firstPosition, secondPosition) <= 1.5f;
         }
     }
 }
