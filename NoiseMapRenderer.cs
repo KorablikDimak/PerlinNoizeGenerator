@@ -14,6 +14,8 @@ namespace PerlyNoizeGenerator
         private readonly MyColor[] _myColorWeightArray = new MyColor[7];
         private readonly MyColor[] _myColorTemperatureArray = new MyColor[7];
         private readonly MyColor[] _myColorHeightArray = new MyColor[7];
+        [SerializeField] private GameObject[] voxelPrefabs = new GameObject[7];
+        private GameObject[,] _voxels;
         private float[,] _temperatureMap;
         private float[,] _weightMap;
         private float[,] _noiseMap;
@@ -36,6 +38,7 @@ namespace PerlyNoizeGenerator
         [Range(-0.5f, 0.5f)] public float groundLevel;
         [Range(0, 0.5f)] public float waterLevel;
         public bool rivers;
+        public bool render3D;
 
         public enum TypeOfMap
         {
@@ -146,7 +149,7 @@ namespace PerlyNoizeGenerator
 
             _texture2D.Apply();
             renderer.sharedMaterial.mainTexture = _texture2D;
-            renderer.transform.localScale = new Vector3(_mapSizeX, 0, _mapSizeY);
+            renderer.transform.localScale = new Vector3(_mapSizeX / 10f, 0, _mapSizeY / 10f);
         }
 
         private List<River> CreateRivers()
@@ -278,6 +281,24 @@ namespace PerlyNoizeGenerator
             });
 
             _texture2D.SetPixels(colorsMap);
+            
+            if (render3D)
+            {
+                _voxels = new GameObject[_mapSizeX, _mapSizeY];
+                for (int x = 0; x < _mapSizeX; x++)
+                {
+                    for (int y = 0; y < _mapSizeY; y++)
+                    {
+                        for (int i = 0; i < 7; i++)
+                        {
+                            if (colorsMap[y * _mapSizeY + x] == _myColorArray[i].Color)
+                            {
+                                _voxels[x, y] = Instantiate(voxelPrefabs[i], new Vector3(x - _mapSizeX / 2, 0, y - _mapSizeY / 2), Quaternion.identity);
+                            }
+                        }
+                    }
+                }
+            }
 
             if (!rivers) return;
             foreach (var position in riversList.SelectMany(river => river.Positions))

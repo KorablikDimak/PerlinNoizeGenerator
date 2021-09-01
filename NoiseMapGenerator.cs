@@ -7,10 +7,10 @@ namespace PerlyNoizeGenerator
         [SerializeField] private NoiseMapRenderer noiseMapRenderer;
         
         //config:
-        [SerializeField] private float scale;
-        [Range(0, 1)][SerializeField] private float persistance;
-        [SerializeField] private float lacunarity;
-        [SerializeField] private int octaves;
+        private const float Scale = 4.5f;
+        private const float Persistance = 1;
+        private const float Lacunarity = 0.72f;
+        private const int Octaves = 20;
         private int _mapSizeX;
         private int _mapSizeY;
 
@@ -29,7 +29,7 @@ namespace PerlyNoizeGenerator
         
         private void Update()
         {
-            if (autoUpdate && _mapSizeX * _mapSizeY <= 300 * 300 && !noiseMapRenderer.rivers)
+            if (autoUpdate && _mapSizeX * _mapSizeY <= 300 * 300 && !noiseMapRenderer.rivers && !noiseMapRenderer.render3D)
             {
                 GenerateMap();
             }
@@ -51,10 +51,6 @@ namespace PerlyNoizeGenerator
                 case MapSize.Medium:
                     _mapSizeX = 300;
                     _mapSizeY = 300;
-                    scale = 5;
-                    octaves = 20;
-                    lacunarity = 0.72f;
-                    persistance = 1;
                     break;
                 case MapSize.Large:
                     _mapSizeX = 500;
@@ -69,11 +65,11 @@ namespace PerlyNoizeGenerator
             }
             
             float[,] noiseMap = 
-                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, scale, seed, octaves, persistance, lacunarity);
+                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, Scale, seed, Octaves, Persistance, Lacunarity);
             float[,] weightMap =
-                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, scale, seed + 1, octaves, persistance, lacunarity);
+                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, Scale, seed + 1, Octaves, Persistance, Lacunarity);
             float[,] riversMap =
-                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, scale, seed + 2, octaves, 0, lacunarity);
+                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, Scale, seed + 2, Octaves, 0, Lacunarity);
 
             noiseMapRenderer.RendererNoiseMap(noiseMap, weightMap, riversMap);
         }
