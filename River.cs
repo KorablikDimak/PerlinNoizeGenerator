@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PerlyNoizeGenerator
+namespace PerlinNoiseGenerator
 {
     public class River
     {

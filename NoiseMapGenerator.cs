@@ -1,16 +1,21 @@
+using System.Threading;
 using UnityEngine;
 
-namespace PerlyNoizeGenerator
+namespace PerlinNoiseGenerator
 {
     public class NoiseMapGenerator : MonoBehaviour
     {
+        //player will not change this:
         [SerializeField] private NoiseMapRenderer noiseMapRenderer;
+        private float[,] _noiseMap;
+        private float[,] _weightMap;
+        private float[,] _riversMap;
         
         //config:
-        private const float Scale = 4.5f;
-        private const float Persistance = 1;
+        [Range(0, 0.025f)] [SerializeField] private float scale = 0.012f;
+        private const int Octaves = 8;
+        private const float Persistance = 0;
         private const float Lacunarity = 0.72f;
-        private const int Octaves = 20;
         private int _mapSizeX;
         private int _mapSizeY;
 
@@ -26,10 +31,10 @@ namespace PerlyNoizeGenerator
             Large,
             Giant
         }
-        
+
         private void Update()
         {
-            if (autoUpdate && _mapSizeX * _mapSizeY <= 300 * 300 && !noiseMapRenderer.rivers && !noiseMapRenderer.render3D)
+            if (autoUpdate && _mapSizeX * _mapSizeY <= 300 * 300 && !noiseMapRenderer.rivers)
             {
                 GenerateMap();
             }
@@ -39,14 +44,14 @@ namespace PerlyNoizeGenerator
                 GenerateMap();
             }
         }
-
+        
         private void GenerateMap()
         {
             switch (mapSize)
             {
                 case MapSize.Small:
-                    _mapSizeX = 100;
-                    _mapSizeY = 100;
+                    _mapSizeX = 150;
+                    _mapSizeY = 150;
                     break;
                 case MapSize.Medium:
                     _mapSizeX = 300;
@@ -63,15 +68,37 @@ namespace PerlyNoizeGenerator
                 default:
                     return;
             }
-            
-            float[,] noiseMap = 
-                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, Scale, seed, Octaves, Persistance, Lacunarity);
-            float[,] weightMap =
-                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, Scale, seed + 1, Octaves, Persistance, Lacunarity);
-            float[,] riversMap =
-                Noise.GenerateNoiseMap(_mapSizeX, _mapSizeY, Scale, seed + 2, Octaves, 0, Lacunarity);
 
-            noiseMapRenderer.RendererNoiseMap(noiseMap, weightMap, riversMap);
+            var thread1 = new Thread(NoiseMapCreate);
+            thread1.Start();
+            var thread2 = new Thread(WeightMapCreate);
+            thread2.Start();
+            var thread3 = new Thread(RiversMapCreate);
+            thread3.Start();
+            while (thread1.ThreadState != ThreadState.Stopped ||
+                   thread2.ThreadState != ThreadState.Stopped ||
+                   thread3.ThreadState != ThreadState.Stopped) { }
+            NoiseMapCreate();
+            noiseMapRenderer.RendererNoiseMap(_noiseMap, _weightMap, _riversMap);
+        }
+
+        private void NoiseMapCreate()
+        {
+            _noiseMap = new float[_mapSizeX * 4, _mapSizeY * 4];
+            _noiseMap = Simplex.GenerateNoiseMap(_mapSizeX, _mapSizeY, scale);
+        }
+
+        private void WeightMapCreate()
+        {
+            _weightMap = new float[_mapSizeX * 4, _mapSizeY * 4];
+            _weightMap = Simplex.GenerateNoiseMap(_mapSizeX, _mapSizeY, scale);
+        }
+
+        private void RiversMapCreate()
+        {
+            if (!noiseMapRenderer.rivers) return;
+            _riversMap = new float[_mapSizeX * 4, _mapSizeY * 4];
+            _riversMap = Noise.GenerateNoiseMap(_mapSizeX * 4, _mapSizeY * 4, scale + 5, seed, Octaves + 10, Persistance, Lacunarity);
         }
     }
 }

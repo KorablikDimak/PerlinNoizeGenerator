@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PerlyNoizeGenerator
+namespace PerlinNoiseGenerator
 {
     public readonly struct MyColor
     {

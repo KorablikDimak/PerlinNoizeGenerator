@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PerlyNoizeGenerator
+namespace PerlinNoiseGenerator
 {
     public class NoiseMapRenderer : MonoBehaviour
     {
@@ -14,8 +14,6 @@ namespace PerlyNoizeGenerator
         private readonly MyColor[] _myColorWeightArray = new MyColor[7];
         private readonly MyColor[] _myColorTemperatureArray = new MyColor[7];
         private readonly MyColor[] _myColorHeightArray = new MyColor[7];
-        [SerializeField] private GameObject[] voxelPrefabs = new GameObject[7];
-        private GameObject[,] _voxels;
         private float[,] _temperatureMap;
         private float[,] _weightMap;
         private float[,] _noiseMap;
@@ -38,7 +36,6 @@ namespace PerlyNoizeGenerator
         [Range(-0.5f, 0.5f)] public float groundLevel;
         [Range(0, 0.5f)] public float waterLevel;
         public bool rivers;
-        public bool render3D;
 
         public enum TypeOfMap
         {
@@ -105,8 +102,8 @@ namespace PerlyNoizeGenerator
                 for (int y = 0; y < _mapSizeY; y++)
                 {
                     _noiseMap[x, y] = noiseMap[x, y] + groundLevel;
-                    _weightMap[x, y] = weightMap[x, y] + weight / 2 + waterLevel / 2;
                     _temperatureMap[x, y] = TemperatureNoiseCreate(x, y);
+                    _weightMap[x, y] = weightMap[x, y] + weight / 2 + waterLevel / 2;
                     if (rivers)
                     {
                         _riversMap[x, y] = riversMap[x, y];
@@ -134,6 +131,16 @@ namespace PerlyNoizeGenerator
                     setColor = SimpleRender;
                     setNoise = SimpleCreate;
                     SetPixelsToTexture(setColor, setNoise);
+                    for (int x = 0; x < _mapSizeX; x++)
+                    {
+                        for (int y = 0; y < _mapSizeY; y++)
+                        {
+                            if (_temperatureMap[x, y] > 0.5)
+                            {
+                                _texture2D.SetPixel(x, y, _myColorArray[6].Color);
+                            }
+                        }
+                    }
                     break;
                 case TypeOfMap.Height:
                     setColor = HeightRender;
@@ -147,9 +154,9 @@ namespace PerlyNoizeGenerator
                     throw new ArgumentOutOfRangeException();
             }
 
-            _texture2D.Apply();
-            renderer.sharedMaterial.mainTexture = _texture2D;
-            renderer.transform.localScale = new Vector3(_mapSizeX / 10f, 0, _mapSizeY / 10f);
+            Texture2D mainTexture = RenderSphereMap.RendererNoiseMap(_texture2D, _mapSizeX / 4, _mapSizeY / 4);
+            mainTexture.Apply();
+            renderer.sharedMaterial.mainTexture = mainTexture;
         }
 
         private List<River> CreateRivers()
@@ -160,14 +167,21 @@ namespace PerlyNoizeGenerator
             {
                 for (int y = 0; y < _mapSizeY; y++)
                 {
-                    if (!(_noiseMap[x, y] > _myColorArray[4].Level) ||
-                        !(_riversMap[x, y] > 0.7f) ||
-                        !(_noiseMap[x, y] < _myColorArray[5].Level) ||
-                        !(_weightMap[x, y] > 0.7f)) continue;
-                    var riverToAdd = new River();
-                    if (riverToAdd.RiverGen(new Vector2Int(x, y), _noiseMap, _myColorArray[1].Level))
+                    if (!(_noiseMap[x, y] > _myColorArray[4].Level) || 
+                        !(_noiseMap[x, y] < _myColorArray[5].Level) || 
+                        !(_weightMap[x, y] > 0.7f || 
+                        !(_riversMap[x, y] < 0.7f))) continue;
+                    if (riversList.Count < 100)
                     {
-                        riversList.Add(riverToAdd);
+                        var riverToAdd = new River();
+                        if (riverToAdd.RiverGen(new Vector2Int(x, y), _noiseMap, _myColorArray[1].Level))
+                        {
+                            riversList.Add(riverToAdd);
+                        }
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }
@@ -281,24 +295,6 @@ namespace PerlyNoizeGenerator
             });
 
             _texture2D.SetPixels(colorsMap);
-            
-            if (render3D)
-            {
-                _voxels = new GameObject[_mapSizeX, _mapSizeY];
-                for (int x = 0; x < _mapSizeX; x++)
-                {
-                    for (int y = 0; y < _mapSizeY; y++)
-                    {
-                        for (int i = 0; i < 7; i++)
-                        {
-                            if (colorsMap[y * _mapSizeY + x] == _myColorArray[i].Color)
-                            {
-                                _voxels[x, y] = Instantiate(voxelPrefabs[i], new Vector3(x - _mapSizeX / 2, 0, y - _mapSizeY / 2), Quaternion.identity);
-                            }
-                        }
-                    }
-                }
-            }
 
             if (!rivers) return;
             foreach (var position in riversList.SelectMany(river => river.Positions))
@@ -316,17 +312,11 @@ namespace PerlyNoizeGenerator
             return Mathf.Sqrt(Mathf.Pow(_myColorArray[2].Level - _noiseMap[x, y], 2)) * temperature + distanceFromEquator * temperature;
         }
 
-        private void SimpleCreate(int x, int y)
-        {
-            if (_temperatureMap[x, y] > 0.5)
-            {
-                _noiseMap[x, y] = 1;
-            }
-        }
+        private void SimpleCreate(int x, int y) { }
 
         private Color32 SimpleRender(int x, int y)
         {
-            return GetPixelColor(_noiseMap[x, y], _weightMap[x, y]);
+            return GetPixelColor(_noiseMap[x, y], _weightMap[x, y] + _temperatureMap[x, y] / 2);
         }
 
         private void IslandCreate(int x, int y)
@@ -359,7 +349,7 @@ namespace PerlyNoizeGenerator
 
         private Color32 WeightRender(int x, int y)
         {
-            return GetPixelColor(_weightMap[x, y], _myColorWeightArray);
+            return GetPixelColor(_weightMap[x, y] + _temperatureMap[x, y] / 2, _myColorWeightArray);
         }
 
         private Color32 TemperatureRender(int x, int y)
