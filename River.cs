@@ -26,7 +26,7 @@ namespace PerlinNoiseGenerator
             Vector2Int preferPosition = FindLowest(startPosition.x, startPosition.y, noiseMap);
             FindPathToWater(startPosition, preferPosition, noiseMap, waterLevel);
 
-            return Positions.Count > 10;
+            return Positions.Count > 30;
         }
 
         public static void DigRiver(River river)

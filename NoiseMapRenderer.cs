@@ -177,6 +177,19 @@ namespace PerlinNoiseGenerator
             
             _texture2D.Apply();
             renderer.sharedMaterial.mainTexture = _texture2D;
+            
+            var colorsMap = new Color[_mapSizeX * _mapSizeY];
+            Parallel.For(0, _mapSizeX, x =>
+            {
+                for (int y = 0; y < _mapSizeY; y++)
+                {
+                    colorsMap[y * _mapSizeY + x] = Color.Lerp(Color.black, Color.white, _noiseMap[x, y]);
+                }
+            });
+            var heightTexture = new Texture2D(_mapSizeX, _mapSizeY);
+            heightTexture.SetPixels(colorsMap);
+            heightTexture.Apply();
+            renderer.sharedMaterial.SetTexture("_ParallaxMap", heightTexture);
             StartCoroutine(RotateSphere());
         }
 
@@ -190,9 +203,9 @@ namespace PerlinNoiseGenerator
                 {
                     if (!(_noiseMap[x, y] > _myColorArray[4].Level) || 
                         !(_noiseMap[x, y] < _myColorArray[5].Level) || 
-                        !(_weightMap[x, y] > 0.7f || 
-                        !(_riversMap[x, y] < 0.7f))) continue;
-                    if (riversList.Count < 100)
+                        !(_weightMap[x, y] > 0.65f) || 
+                        !(_riversMap[x, y] > 0.85f)) continue;
+                    if (riversList.Count < _mapSizeX)
                     {
                         var riverToAdd = new River();
                         if (riverToAdd.RiverGen(new Vector2Int(x, y), _noiseMap, _myColorArray[1].Level))
