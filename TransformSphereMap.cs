@@ -2,37 +2,43 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator
 {
-    public static class RenderSphereMap
+    public static class TransformSphereMap
     {
-        public static Texture2D RendererNoiseMap(Texture2D texture2D, int mapSizeX, int mapSizeY)
+        public static float[,] TransformNoiseMap(float[,] noiseMap, int mapSizeX, int mapSizeY)
         {
-            var sourceTexture = new Texture2D(mapSizeX * 4, mapSizeY * 3);
-            for (int x = 0; x < texture2D.width; x++)
+            var sourceNoiseMap = new float[mapSizeX * 4, mapSizeY * 3];
+            int width = noiseMap.GetLength(0);
+            int height = noiseMap.GetLength(1);
+            
+            for (int x = 0; x < width; x++)
             {
-                for (int y = mapSizeY; y < texture2D.height; y++)
+                for (int y = mapSizeY; y < height; y++)
                 {
-                    sourceTexture.SetPixel(x, y - mapSizeY, texture2D.GetPixel(x, y - mapSizeY));
+                    sourceNoiseMap[x, y - mapSizeY] = noiseMap[x, y - mapSizeY];
                 }
             }
             
-            var equiTexture = new Texture2D(mapSizeX, mapSizeY);
+            var equiNoiseMap = new float[mapSizeX, mapSizeY];
             float u, v;
             float phi, theta;
             
-            var cubeFaceWidth = sourceTexture.width / 4; //4 horizontal faces
-            var cubeFaceHeight = sourceTexture.height / 3;
+            int cubeFaceWidth = mapSizeX; //4 horizontal faces
+            int cubeFaceHeight = mapSizeY;
 
-            for (int j = 0; j < equiTexture.height; j++)
+            width = sourceNoiseMap.GetLength(0);
+            height = sourceNoiseMap.GetLength(1);
+            
+            for (int j = 0; j < mapSizeY; j++)
             {
 
                 //Rows start from the bottom
-                v = 1 - ((float) j / equiTexture.height);
+                v = 1 - ((float) j / mapSizeY);
                 theta = v * Mathf.PI;
 
-                for (int i = 0; i < equiTexture.width; i++)
+                for (int i = 0; i < mapSizeX; i++)
                 {
                     //Columns start from the left
-                    u = ((float) i / equiTexture.width);
+                    u = ((float) i / mapSizeX);
                     phi = u * 2 * Mathf.PI;
 
                     float x, y, z; //Unit vector
@@ -50,7 +56,6 @@ namespace PerlinNoiseGenerator
                     ya = y / a;
                     za = z / a;
 
-                    Color color;
                     int xPixel, yPixel;
                     int xOffset, yOffset;
 
@@ -117,12 +122,15 @@ namespace PerlinNoiseGenerator
                     xPixel += xOffset;
                     yPixel += yOffset;
 
-                    color = sourceTexture.GetPixel(xPixel, yPixel);
-                    equiTexture.SetPixel(i, j, color);
+                    if (xPixel >= width || yPixel >= height)
+                    {
+                        continue;
+                    }
+                    equiNoiseMap[i, j] = sourceNoiseMap[xPixel, yPixel];
                 }
             }
 
-            return equiTexture;
+            return equiNoiseMap;
         }
     }
 }

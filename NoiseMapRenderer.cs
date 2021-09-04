@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,12 +31,15 @@ namespace PerlinNoiseGenerator
         private int _mapSizeY;
 
         //player will change this:
+        [Range(0, 1)] public float rotateSpeed;
         [Range(0, 2)] public float temperature;
         [Range(0, 1)] public float weight;
         public TypeOfMap typeOfMap;
         [Range(-0.5f, 0.5f)] public float groundLevel;
         [Range(0, 0.5f)] public float waterLevel;
         public bool rivers;
+        public int seed;
+        public MapSize mapSize;
 
         public enum TypeOfMap
         {
@@ -47,14 +51,22 @@ namespace PerlinNoiseGenerator
             Weight
         }
         
+        public enum MapSize
+        {
+            Small,
+            Medium,
+            Large,
+            Giant
+        }
+        
         private void Start()
         {
-            _myColorArray[0] = new MyColor(0.321f, new Color32(49, 49, 159, 255));
-            _myColorArray[1] = new MyColor(0.37f, new Color32(0, 224, 255, 255));
-            _myColorArray[2] = new MyColor(0.427f, new Color32(246, 255, 0, 255));
-            _myColorArray[3] = new MyColor(0.557f, new Color32(0, 255, 0, 255));
-            _myColorArray[4] = new MyColor(0.686f, new Color32(23, 137, 16, 255));
-            _myColorArray[5] = new MyColor(0.839f, new Color32(152, 152, 152, 255));
+            _myColorArray[0] = new MyColor(0.301f, new Color32(49, 49, 159, 255));
+            _myColorArray[1] = new MyColor(0.34f, new Color32(0, 224, 255, 255));
+            _myColorArray[2] = new MyColor(0.401f, new Color32(246, 255, 0, 255));
+            _myColorArray[3] = new MyColor(0.547f, new Color32(0, 255, 0, 255));
+            _myColorArray[4] = new MyColor(0.703f, new Color32(23, 137, 16, 255));
+            _myColorArray[5] = new MyColor(0.914f, new Color32(152, 152, 152, 255));
             _myColorArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
             
             _myColorWeightArray[0] = new MyColor(0.295f, new Color32(255, 0, 0, 255));
@@ -73,13 +85,22 @@ namespace PerlinNoiseGenerator
             _myColorTemperatureArray[5] = new MyColor(0.55f, new Color32(255, 255, 150, 255));
             _myColorTemperatureArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
             
-            _myColorHeightArray[0] = new MyColor(0.321f, new Color32(0, 0, 0, 255));
-            _myColorHeightArray[1] = new MyColor(0.37f, new Color32(30, 30, 30, 255));
-            _myColorHeightArray[2] = new MyColor(0.427f, new Color32(60, 60, 60, 255));
-            _myColorHeightArray[3] = new MyColor(0.557f, new Color32(100, 100, 100, 255));
-            _myColorHeightArray[4] = new MyColor(0.686f, new Color32(150, 150, 150, 255));
-            _myColorHeightArray[5] = new MyColor(0.839f, new Color32(200, 200, 200, 255));
+            _myColorHeightArray[0] = new MyColor(0.301f, new Color32(0, 0, 0, 255));
+            _myColorHeightArray[1] = new MyColor(0.34f, new Color32(30, 30, 30, 255));
+            _myColorHeightArray[2] = new MyColor(0.401f, new Color32(60, 60, 60, 255));
+            _myColorHeightArray[3] = new MyColor(0.547f, new Color32(100, 100, 100, 255));
+            _myColorHeightArray[4] = new MyColor(0.703f, new Color32(150, 150, 150, 255));
+            _myColorHeightArray[5] = new MyColor(0.914f, new Color32(200, 200, 200, 255));
             _myColorHeightArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
+        }
+
+        public IEnumerator RotateSphere()
+        {
+            while (true)
+            {
+                transform.Rotate(0, 0.1f * rotateSpeed, 0);
+                yield return new WaitForSeconds(1f / 30f);
+            }
         }
 
         public void RendererNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
@@ -153,10 +174,10 @@ namespace PerlinNoiseGenerator
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            Texture2D mainTexture = RenderSphereMap.RendererNoiseMap(_texture2D, _mapSizeX / 4, _mapSizeY / 4);
-            mainTexture.Apply();
-            renderer.sharedMaterial.mainTexture = mainTexture;
+            
+            _texture2D.Apply();
+            renderer.sharedMaterial.mainTexture = _texture2D;
+            StartCoroutine(RotateSphere());
         }
 
         private List<River> CreateRivers()
