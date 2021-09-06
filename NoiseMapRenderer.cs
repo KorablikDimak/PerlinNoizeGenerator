@@ -9,12 +9,13 @@ namespace PerlinNoiseGenerator
 {
     public class NoiseMapRenderer : MonoBehaviour
     {
-        //player will not change this:
         [SerializeField] private new Renderer renderer;
         private readonly MyColor[] _myColorArray = new MyColor[7];
         private readonly MyColor[] _myColorWeightArray = new MyColor[7];
         private readonly MyColor[] _myColorTemperatureArray = new MyColor[7];
         private readonly MyColor[] _myColorHeightArray = new MyColor[7];
+        private int _mapSizeX;
+        private int _mapSizeY;
         private float[,] _temperatureMap;
         private float[,] _weightMap;
         private float[,] _noiseMap;
@@ -29,8 +30,6 @@ namespace PerlinNoiseGenerator
         private const float UpAll = 0.05f;
         private const float DownCoast = 1.6f;
         private const float Speed = 2.5f;
-        private int _mapSizeX;
-        private int _mapSizeY;
 
         //player will change this:
         [Range(0, 1)] public float rotateSpeed;
@@ -42,6 +41,13 @@ namespace PerlinNoiseGenerator
         public bool rivers;
         public int seed;
         public MapSize mapSize;
+        public TypeOfRenderer typeOfRenderer;
+        
+        public enum TypeOfRenderer
+        {
+            Plane,
+            Sphere
+        }
 
         public enum TypeOfMap
         {
