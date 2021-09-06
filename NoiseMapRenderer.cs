@@ -24,6 +24,8 @@ namespace PerlinNoiseGenerator
         private delegate void SetNoise(int x, int y);
         
         //config:
+        private const float NormalScale = 0.62f;
+        private const float HeightScale = 0.03f;
         private const float UpAll = 0.05f;
         private const float DownCoast = 1.6f;
         private const float Speed = 2.5f;
@@ -69,12 +71,12 @@ namespace PerlinNoiseGenerator
             _myColorArray[5] = new MyColor(0.914f, new Color32(152, 152, 152, 255));
             _myColorArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
             
-            _myColorWeightArray[0] = new MyColor(0.295f, new Color32(255, 0, 0, 255));
-            _myColorWeightArray[1] = new MyColor(0.394f, new Color32(255, 144, 0, 255));
-            _myColorWeightArray[2] = new MyColor(0.508f, new Color32(224, 255, 0, 255));
-            _myColorWeightArray[3] = new MyColor(0.676f, new Color32(0, 255, 242, 255));
-            _myColorWeightArray[4] = new MyColor(0.758f, new Color32(0, 145, 255, 255));
-            _myColorWeightArray[5] = new MyColor(0.853f, new Color32(0, 100, 255, 255));
+            _myColorWeightArray[0] = new MyColor(0.314f, new Color32(255, 0, 0, 255));
+            _myColorWeightArray[1] = new MyColor(0.409f, new Color32(255, 144, 0, 255));
+            _myColorWeightArray[2] = new MyColor(0.529f, new Color32(224, 255, 0, 255));
+            _myColorWeightArray[3] = new MyColor(0.691f, new Color32(0, 255, 242, 255));
+            _myColorWeightArray[4] = new MyColor(0.789f, new Color32(0, 145, 255, 255));
+            _myColorWeightArray[5] = new MyColor(0.896f, new Color32(0, 100, 255, 255));
             _myColorWeightArray[6] = new MyColor(1f, new Color32(0, 0, 255, 255));
             
             _myColorTemperatureArray[0] = new MyColor(0.1f, new Color32(255, 0, 0, 255));
@@ -94,7 +96,7 @@ namespace PerlinNoiseGenerator
             _myColorHeightArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
         }
 
-        public IEnumerator RotateSphere()
+        private IEnumerator RotateSphere()
         {
             while (true)
             {
@@ -152,6 +154,7 @@ namespace PerlinNoiseGenerator
                     setColor = SimpleRender;
                     setNoise = SimpleCreate;
                     SetPixelsToTexture(setColor, setNoise);
+                    //create polar hats
                     for (int x = 0; x < _mapSizeX; x++)
                     {
                         for (int y = 0; y < _mapSizeY; y++)
@@ -174,10 +177,20 @@ namespace PerlinNoiseGenerator
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
+            SetShader();
+            StartCoroutine(RotateSphere());
+        }
+
+        private void SetShader()
+        {
+            renderer.sharedMaterial.EnableKeyword("_NORMALMAP");
+            renderer.sharedMaterial.EnableKeyword("_PARALLAXMAP");
+                
             _texture2D.Apply();
             renderer.sharedMaterial.mainTexture = _texture2D;
             
+            //heights map for shader
             var colorsMap = new Color[_mapSizeX * _mapSizeY];
             Parallel.For(0, _mapSizeX, x =>
             {
@@ -189,8 +202,14 @@ namespace PerlinNoiseGenerator
             var heightTexture = new Texture2D(_mapSizeX, _mapSizeY);
             heightTexture.SetPixels(colorsMap);
             heightTexture.Apply();
+            renderer.sharedMaterial.SetFloat("_Parallax", HeightScale);
             renderer.sharedMaterial.SetTexture("_ParallaxMap", heightTexture);
-            StartCoroutine(RotateSphere());
+
+            //normals map for shader
+            Texture2D normalTexture = NormalMapGenerator.CreateNormalMap(_noiseMap, _mapSizeX, _mapSizeY);
+            normalTexture.Apply();
+            renderer.sharedMaterial.SetFloat("_BumpScale", NormalScale);
+            renderer.sharedMaterial.SetTexture("_BumpMap", normalTexture);
         }
 
         private List<River> CreateRivers()
@@ -201,11 +220,12 @@ namespace PerlinNoiseGenerator
             {
                 for (int y = 0; y < _mapSizeY; y++)
                 {
+                    //possible points to start rivers
                     if (!(_noiseMap[x, y] > _myColorArray[4].Level) || 
                         !(_noiseMap[x, y] < _myColorArray[5].Level) || 
                         !(_weightMap[x, y] > 0.65f) || 
-                        !(_riversMap[x, y] > 0.85f)) continue;
-                    if (riversList.Count < _mapSizeX)
+                        !(_riversMap[x, y] > 0.9f)) continue;
+                    if (riversList.Count < _mapSizeX && riversList.Count < 400)
                     {
                         var riverToAdd = new River();
                         if (riverToAdd.RiverGen(new Vector2Int(x, y), _noiseMap, _myColorArray[1].Level))
@@ -220,11 +240,12 @@ namespace PerlinNoiseGenerator
                 }
             }
 
-            List<RiversGroup> riversGroups = RiversGroup.BuildRiversGroups(riversList);
+            List<RiversGroup> riversGroups = RiversGroup.BuildRiversGroups(riversList, _mapSizeX, _mapSizeY);
             var riversListOut = new List<River>();
 
             foreach (var riversGroup in riversGroups)
             {
+                //only the longest rivers in group were spawn
                 var maxCount = int.MinValue;
                 River longestRiver = riversGroup.GroupOfRivers[0];
 
@@ -346,6 +367,7 @@ namespace PerlinNoiseGenerator
             return Mathf.Sqrt(Mathf.Pow(_myColorArray[2].Level - _noiseMap[x, y], 2)) * temperature + distanceFromEquator * temperature;
         }
 
+        //empty method for delegate
         private void SimpleCreate(int x, int y) { }
 
         private Color32 SimpleRender(int x, int y)

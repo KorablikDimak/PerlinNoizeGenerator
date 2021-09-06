@@ -22,7 +22,7 @@ namespace PerlinNoiseGenerator
 
         private void Update()
         {
-            if (!Input.GetKeyDown(KeyCode.E)) return;
+            if (!Input.GetKeyDown(KeyCode.G)) return;
             StopAllCoroutines();
             GenerateMap();
         }
@@ -63,7 +63,10 @@ namespace PerlinNoiseGenerator
             thread3.Start();
             while (thread1.ThreadState != ThreadState.Stopped ||
                    thread2.ThreadState != ThreadState.Stopped ||
-                   thread3.ThreadState != ThreadState.Stopped) { }
+                   thread3.ThreadState != ThreadState.Stopped)
+            {
+                Thread.Sleep(100);
+            }
             noiseMapRenderer.RendererNoiseMap(_transformedNoiseMap, _transformedweightMap, _transformedriversMap);
         }
 

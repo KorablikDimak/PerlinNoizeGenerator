@@ -31,6 +31,7 @@ namespace PerlinNoiseGenerator
 
         public static void DigRiver(River river)
         {
+            //the rivers are wider towards the end 
             int countBeforeDigging = river.Positions.Count;
             for (int i = countBeforeDigging - 1; i >= countBeforeDigging / 1.6; i--)
             {
