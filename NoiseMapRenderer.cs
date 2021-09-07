@@ -9,7 +9,8 @@ namespace PerlinNoiseGenerator
 {
     public class NoiseMapRenderer : MonoBehaviour
     {
-        [SerializeField] private new Renderer renderer;
+        [SerializeField] private LoadIndicator loadIndicator;
+        public new Renderer renderer;
         private readonly MyColor[] _myColorArray = new MyColor[7];
         private readonly MyColor[] _myColorWeightArray = new MyColor[7];
         private readonly MyColor[] _myColorTemperatureArray = new MyColor[7];
@@ -32,22 +33,12 @@ namespace PerlinNoiseGenerator
         private const float Speed = 2.5f;
 
         //player will change this:
-        [Range(0, 1)] public float rotateSpeed;
-        [Range(0, 2)] public float temperature;
-        [Range(0, 1)] public float weight;
+        public float temperature;
+        public float weight;
         public TypeOfMap typeOfMap;
-        [Range(-0.5f, 0.5f)] public float groundLevel;
-        [Range(0, 0.5f)] public float waterLevel;
+        public float groundLevel;
+        public float waterLevel;
         public bool rivers;
-        public int seed;
-        public MapSize mapSize;
-        public TypeOfRenderer typeOfRenderer;
-        
-        public enum TypeOfRenderer
-        {
-            Plane,
-            Sphere
-        }
 
         public enum TypeOfMap
         {
@@ -58,15 +49,7 @@ namespace PerlinNoiseGenerator
             Height,
             Weight
         }
-        
-        public enum MapSize
-        {
-            Small,
-            Medium,
-            Large,
-            Giant
-        }
-        
+
         private void Start()
         {
             _myColorArray[0] = new MyColor(0.301f, new Color32(49, 49, 159, 255));
@@ -102,16 +85,7 @@ namespace PerlinNoiseGenerator
             _myColorHeightArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
         }
 
-        private IEnumerator RotateSphere()
-        {
-            while (true)
-            {
-                transform.Rotate(0, 0.1f * rotateSpeed, 0);
-                yield return new WaitForSeconds(1f / 30f);
-            }
-        }
-
-        public void RendererNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
+        public IEnumerator RendererNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
         {
             _mapSizeX = noiseMap.GetLength(0);
             _mapSizeY = noiseMap.GetLength(1);
@@ -123,8 +97,6 @@ namespace PerlinNoiseGenerator
             {
                 _riversMap = new float[_mapSizeX, _mapSizeY];
             }
-            SetColor setColor;
-            SetNoise setNoise;
 
             Parallel.For(0, _mapSizeX, x =>
             {
@@ -139,7 +111,23 @@ namespace PerlinNoiseGenerator
                     }
                 }
             });
+            
+            loadIndicator.SetText("генерация рек и ландщафта");
+            loadIndicator.AddProgress(0.3f);
+            SwitchTypeOfMap();
+            yield return null;
+            
+            loadIndicator.SetText("установка шейдеров");
+            loadIndicator.AddProgress(0.2f);
+            SetShaders();
+            yield return null;
+        }
 
+        private void SwitchTypeOfMap()
+        {
+            SetColor setColor;
+            SetNoise setNoise;
+            
             switch (typeOfMap)
             {
                 case TypeOfMap.Island:
@@ -183,19 +171,26 @@ namespace PerlinNoiseGenerator
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            SetShader();
-            StartCoroutine(RotateSphere());
         }
 
-        private void SetShader()
+        private void SetShaders()
         {
             renderer.sharedMaterial.EnableKeyword("_NORMALMAP");
             renderer.sharedMaterial.EnableKeyword("_PARALLAXMAP");
-                
+            
+            SetMainTexture();
+            SetHeightMap();
+            SetNormalMap();
+        }
+
+        private void SetMainTexture()
+        {
             _texture2D.Apply();
             renderer.sharedMaterial.mainTexture = _texture2D;
-            
+        }
+
+        private void SetHeightMap()
+        {
             //heights map for shader
             var colorsMap = new Color[_mapSizeX * _mapSizeY];
             Parallel.For(0, _mapSizeX, x =>
@@ -210,7 +205,10 @@ namespace PerlinNoiseGenerator
             heightTexture.Apply();
             renderer.sharedMaterial.SetFloat("_Parallax", HeightScale);
             renderer.sharedMaterial.SetTexture("_ParallaxMap", heightTexture);
+        }
 
+        private void SetNormalMap()
+        {
             //normals map for shader
             Texture2D normalTexture = NormalMapGenerator.CreateNormalMap(_noiseMap, _mapSizeX, _mapSizeY);
             normalTexture.Apply();
@@ -229,8 +227,8 @@ namespace PerlinNoiseGenerator
                     //possible points to start rivers
                     if (!(_noiseMap[x, y] > _myColorArray[4].Level) || 
                         !(_noiseMap[x, y] < _myColorArray[5].Level) || 
-                        !(_weightMap[x, y] > 0.65f) || 
-                        !(_riversMap[x, y] > 0.9f)) continue;
+                        !(_weightMap[x, y] > 0.6f) || 
+                        !(_riversMap[x, y] > 0.85f)) continue;
                     if (riversList.Count < _mapSizeX && riversList.Count < 400)
                     {
                         var riverToAdd = new River();
