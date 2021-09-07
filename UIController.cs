@@ -19,10 +19,12 @@ namespace PerlinNoiseGenerator
         [SerializeField] private Dropdown dropdownTypeOfRender;
         [SerializeField] private Text rotateSpeedValue;
         [SerializeField] private Slider sliderRotateSpeed;
+        [SerializeField] private Button appCloseButton;
 
         private void Start()
         {
             generateButton.onClick.AddListener(GenerateButtonClicked);
+            appCloseButton.onClick.AddListener(AppCloseButtonClicked);
 
             inputField.characterLimit = 16;
             
@@ -48,6 +50,11 @@ namespace PerlinNoiseGenerator
             sliderWaterLevel.onValueChanged.AddListener(delegate { WaterLevelChange(); });
             sliderRotateSpeed.onValueChanged.AddListener(delegate { RotateSpeedChange(); });
             rotateSpeedValue.text = $"{(int) (sliderRotateSpeed.value * 30)} град/с";
+        }
+
+        private static void AppCloseButtonClicked()
+        {
+            Application.Quit();
         }
 
         private void GenerateButtonClicked()

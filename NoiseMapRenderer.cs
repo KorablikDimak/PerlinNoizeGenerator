@@ -4,12 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace PerlinNoiseGenerator
 {
     public class NoiseMapRenderer : MonoBehaviour
     {
         [SerializeField] private LoadIndicator loadIndicator;
+        [SerializeField] private Button saveButton;
+        [SerializeField] private Canvas saveCanvas;
         public new Renderer renderer;
         private readonly MyColor[] _myColorArray = new MyColor[7];
         private readonly MyColor[] _myColorWeightArray = new MyColor[7];
@@ -22,6 +25,8 @@ namespace PerlinNoiseGenerator
         private float[,] _noiseMap;
         private float[,] _riversMap;
         private Texture2D _texture2D;
+        private Texture2D _normalTexture2D;
+        private Texture2D _heightTexture2D;
         private delegate Color32 SetColor(int x, int y);
         private delegate void SetNoise(int x, int y);
         
@@ -52,6 +57,9 @@ namespace PerlinNoiseGenerator
 
         private void Start()
         {
+            saveButton.onClick.AddListener(SaveButtonClicked);
+            saveCanvas.enabled = false;
+            
             _myColorArray[0] = new MyColor(0.301f, new Color32(49, 49, 159, 255));
             _myColorArray[1] = new MyColor(0.34f, new Color32(0, 224, 255, 255));
             _myColorArray[2] = new MyColor(0.401f, new Color32(246, 255, 0, 255));
@@ -83,6 +91,14 @@ namespace PerlinNoiseGenerator
             _myColorHeightArray[4] = new MyColor(0.703f, new Color32(150, 150, 150, 255));
             _myColorHeightArray[5] = new MyColor(0.914f, new Color32(200, 200, 200, 255));
             _myColorHeightArray[6] = new MyColor(1f, new Color32(255, 255, 255, 255));
+        }
+
+        private void SaveButtonClicked()
+        {
+            TextureSaver.SaveTexture(_texture2D, "main texture");
+            TextureSaver.SaveTexture(_heightTexture2D, "height texture");
+            TextureSaver.SaveTexture(_normalTexture2D, "normal texture");
+            saveCanvas.enabled = true;
         }
 
         public IEnumerator RendererNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
@@ -200,20 +216,20 @@ namespace PerlinNoiseGenerator
                     colorsMap[y * _mapSizeY + x] = Color.Lerp(Color.black, Color.white, _noiseMap[x, y]);
                 }
             });
-            var heightTexture = new Texture2D(_mapSizeX, _mapSizeY);
-            heightTexture.SetPixels(colorsMap);
-            heightTexture.Apply();
+            _heightTexture2D = new Texture2D(_mapSizeX, _mapSizeY);
+            _heightTexture2D.SetPixels(colorsMap);
+            _heightTexture2D.Apply();
             renderer.sharedMaterial.SetFloat("_Parallax", HeightScale);
-            renderer.sharedMaterial.SetTexture("_ParallaxMap", heightTexture);
+            renderer.sharedMaterial.SetTexture("_ParallaxMap", _heightTexture2D);
         }
 
         private void SetNormalMap()
         {
             //normals map for shader
-            Texture2D normalTexture = NormalMapGenerator.CreateNormalMap(_noiseMap, _mapSizeX, _mapSizeY);
-            normalTexture.Apply();
+            _normalTexture2D = NormalMapGenerator.CreateNormalMap(_noiseMap, _mapSizeX, _mapSizeY);
+            _normalTexture2D.Apply();
             renderer.sharedMaterial.SetFloat("_BumpScale", NormalScale);
-            renderer.sharedMaterial.SetTexture("_BumpMap", normalTexture);
+            renderer.sharedMaterial.SetTexture("_BumpMap", _normalTexture2D);
         }
 
         private List<River> CreateRivers()
