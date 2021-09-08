@@ -50,7 +50,7 @@ namespace PerlinNoiseGenerator
             sliderWaterLevel.onValueChanged.AddListener(delegate { WaterLevelChanged(); });
             sliderRotateSpeed.onValueChanged.AddListener(delegate { RotateSpeedChanged(); });
             rotateSpeedValue.text = $"{(int) (sliderRotateSpeed.value * 30)} град/с";
-            rotator.rotateSpeed = sliderRotateSpeed.value;
+            rotator.RotateSpeed = sliderRotateSpeed.value;
         }
 
         private static void AppCloseButtonClicked()
@@ -60,59 +60,59 @@ namespace PerlinNoiseGenerator
 
         private void GenerateButtonClicked()
         {
-            noiseMapGenerator.mapSize = dropdownMapSize.value switch
+            noiseMapGenerator.CurrentMapSize = dropdownMapSize.value switch
             {
                 0 => NoiseMapGenerator.MapSize.Small,
                 1 => NoiseMapGenerator.MapSize.Medium,
                 2 => NoiseMapGenerator.MapSize.Large,
                 3 => NoiseMapGenerator.MapSize.Giant,
-                _ => noiseMapGenerator.mapSize
+                _ => noiseMapGenerator.CurrentMapSize
             };
 
-            noiseMapGenerator.typeOfRenderer = dropdownTypeOfRender.value switch
+            noiseMapGenerator.CurrentTypeOfRenderer = dropdownTypeOfRender.value switch
             {
                 0 => NoiseMapGenerator.TypeOfRenderer.Plane,
                 1 => NoiseMapGenerator.TypeOfRenderer.Sphere,
-                _ => noiseMapGenerator.typeOfRenderer
+                _ => noiseMapGenerator.CurrentTypeOfRenderer
             };
 
-            noiseMapRenderer.typeOfMap = dropdownTypeOfMap.value switch
+            noiseMapRenderer.CurrentTypeOfMap = dropdownTypeOfMap.value switch
             {
                 0 => NoiseMapRenderer.TypeOfMap.Simple,
                 1 => NoiseMapRenderer.TypeOfMap.Weight,
                 2 => NoiseMapRenderer.TypeOfMap.Height,
                 3 => NoiseMapRenderer.TypeOfMap.Temperature,
-                _ => noiseMapRenderer.typeOfMap
+                _ => noiseMapRenderer.CurrentTypeOfMap
             };
 
-            noiseMapGenerator.seed = inputField.text.GetHashCode();
+            noiseMapGenerator.Seed = inputField.text.GetHashCode();
             StartCoroutine(noiseMapGenerator.GenerateAll());
         }
 
         private void RotateSpeedChanged()
         {
-            rotator.rotateSpeed = sliderRotateSpeed.value;
+            rotator.RotateSpeed = sliderRotateSpeed.value;
             rotateSpeedValue.text = $"{(int) (sliderRotateSpeed.value * 30)} град/с";
         }
 
         private void TemperatureChanged()
         {
-            noiseMapRenderer.temperature = sliderTemperature.value;
+            noiseMapRenderer.Temperature = sliderTemperature.value;
         }
         
         private void WeightChanged()
         {
-            noiseMapRenderer.weight = sliderWeight.value;
+            noiseMapRenderer.Weight = sliderWeight.value;
         }
         
         private void GroundLevelChanged()
         {
-            noiseMapRenderer.groundLevel = sliderGroundLevel.value;
+            noiseMapRenderer.GroundLevel = sliderGroundLevel.value;
         }
         
         private void WaterLevelChanged()
         {
-            noiseMapRenderer.waterLevel = sliderWaterLevel.value;
+            noiseMapRenderer.WaterLevel = sliderWaterLevel.value;
         }
     }
 }

@@ -4,8 +4,8 @@ namespace PerlinNoiseGenerator
 {
     public readonly struct MyColor
     {
-        public readonly float Level;
-        public readonly Color32 Color;
+        public float Level { get; }
+        public Color32 Color { get; }
 
         public MyColor(float level, Color32 color)
         {

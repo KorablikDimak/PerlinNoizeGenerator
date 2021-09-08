@@ -22,9 +22,9 @@ namespace PerlinNoiseGenerator
         private int _mapSizeY;
         
         //player will change this:
-        public int seed;
-        public MapSize mapSize;
-        public TypeOfRenderer typeOfRenderer;
+        public int Seed { get; set; }
+        public MapSize CurrentMapSize { get; set; }
+        public TypeOfRenderer CurrentTypeOfRenderer { get; set; }
         
         public enum TypeOfRenderer
         {
@@ -48,7 +48,7 @@ namespace PerlinNoiseGenerator
             {
                 rendererForPlane.enabled = false;
             }
-            rotator.thisTransform = noiseMapRenderer.transform;
+            rotator.ThisTransform = noiseMapRenderer.transform;
             
             loadIndicator.RemoveProgress();
             loadIndicator.SetDefaultSprite();
@@ -90,7 +90,7 @@ namespace PerlinNoiseGenerator
         
         private void SwitchMapSize()
         {
-            switch (mapSize)
+            switch (CurrentMapSize)
             {
                 case MapSize.Small:
                     _mapSizeX = 150;
@@ -119,7 +119,7 @@ namespace PerlinNoiseGenerator
 
         private void GenerateMaps()
         {
-            switch (typeOfRenderer)
+            switch (CurrentTypeOfRenderer)
             {
                 case TypeOfRenderer.Sphere:
                     foreach (var rendererForPlane in renderersForPlane)
@@ -128,8 +128,8 @@ namespace PerlinNoiseGenerator
                     }
                     planeRenderer.enabled = false;
                     sphereRenderer.enabled = true;
-                    rotator.thisTransform = noiseMapRenderer.transform;
-                    _mapsGenerator = new SphereMapsGenerator(_mapSizeX, _mapSizeY, _scale, seed, isRiversOn.isOn);
+                    rotator.ThisTransform = noiseMapRenderer.transform;
+                    _mapsGenerator = new SphereMapsGenerator(_mapSizeX, _mapSizeY, _scale, Seed, isRiversOn.isOn);
                     _mapsGenerator.GenerateMaps();
                     break;
                 case TypeOfRenderer.Plane:
@@ -139,8 +139,8 @@ namespace PerlinNoiseGenerator
                     }
                     planeRenderer.enabled = true;
                     sphereRenderer.enabled = false;
-                    rotator.thisTransform = planeRenderer.transform;
-                    _mapsGenerator = new PlaneMapsGenerator(_mapSizeX, _mapSizeY, _scale, seed, isRiversOn.isOn);
+                    rotator.ThisTransform = planeRenderer.transform;
+                    _mapsGenerator = new PlaneMapsGenerator(_mapSizeX, _mapSizeY, _scale, Seed, isRiversOn.isOn);
                     _mapsGenerator.GenerateMaps();
                     break;
                 default:

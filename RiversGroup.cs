@@ -7,14 +7,14 @@ namespace PerlinNoiseGenerator
     public class RiversGroup
     {
         public List<River> GroupOfRivers { get; } = new List<River>();
-        private static int[,] _count;
-        private static List<Vector2Int> _crossPoints;
+        private static int[,] Count { get; set; }
+        private static List<Vector2Int> CrossPoints { get; set; }
 
         public static List<RiversGroup> BuildRiversGroups(List<River> rivers, int mapSizeX, int mapSizeY)
         {
             var riversGroups = new List<RiversGroup>();
 
-            _count = new int[mapSizeX, mapSizeY];
+            Count = new int[mapSizeX, mapSizeY];
             Parallel.ForEach(rivers, river =>
             {
                 for (int x = 0; x < mapSizeX; x++)
@@ -22,22 +22,22 @@ namespace PerlinNoiseGenerator
                     for (int y = 0; y < mapSizeY; y++)
                     {
                         if (!river.IsRiverHere[x, y]) continue;
-                        lock (_count)
+                        lock (Count)
                         {
-                            _count[x, y]++;
+                            Count[x, y]++;
                         }
                     }
                 }
             });
 
-            _crossPoints = new List<Vector2Int>();
+            CrossPoints = new List<Vector2Int>();
             for (int x = 0; x < mapSizeX; x++)
             {
                 for (int y = 0; y < mapSizeY; y++)
                 {
-                    if (_count[x, y] > 1)
+                    if (Count[x, y] > 1)
                     {
-                        _crossPoints.Add(new Vector2Int(x, y));
+                        CrossPoints.Add(new Vector2Int(x, y));
                     }
                 }
             }
@@ -52,22 +52,22 @@ namespace PerlinNoiseGenerator
                 riversGroups.Add(riversGroup);
             }
 
-            _crossPoints.Clear();
+            CrossPoints.Clear();
             return riversGroups;
         }
 
         private static void ContainRivers(RiversGroup riversGroup, List<River> rivers, River river)
         {
-            foreach (var crossPoint in _crossPoints)
+            foreach (var crossPoint in CrossPoints)
             {
                 for (int i = rivers.Count - 1; i >= 0; i--)
                 {
                     if (!river.IsRiverHere[crossPoint.x, crossPoint.y]) continue;
                     if (!rivers[i].IsRiverHere[crossPoint.x, crossPoint.y]) continue;
-                    _count[crossPoint.x, crossPoint.y]--;
-                    if (_count[crossPoint.x, crossPoint.y] < 2)
+                    Count[crossPoint.x, crossPoint.y]--;
+                    if (Count[crossPoint.x, crossPoint.y] < 2)
                     {
-                        _crossPoints.Remove(crossPoint);
+                        CrossPoints.Remove(crossPoint);
                     }
                     var newRiver = rivers[i];
                     riversGroup.GroupOfRivers.Add(newRiver);

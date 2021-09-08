@@ -32,11 +32,11 @@ namespace PerlinNoiseGenerator
         private delegate void SetNoise(int x, int y);
 
         //player will change this:
-        public float temperature;
-        public float weight;
-        public TypeOfMap typeOfMap;
-        public float groundLevel;
-        public float waterLevel;
+        public float Temperature { get; set; }
+        public float Weight { get; set; }
+        public TypeOfMap CurrentTypeOfMap { get; set; }
+        public float GroundLevel { get; set; }
+        public float WaterLevel { get; set; }
 
         public enum TypeOfMap
         {
@@ -111,9 +111,9 @@ namespace PerlinNoiseGenerator
             {
                 for (int y = 0; y < _mapSizeY; y++)
                 {
-                    _noiseMap[x, y] = noiseMap[x, y] + groundLevel;
+                    _noiseMap[x, y] = noiseMap[x, y] + GroundLevel;
                     _temperatureMap[x, y] = CreateTemperatureNoise(x, y);
-                    _weightMap[x, y] = weightMap[x, y] + weight / 2 + waterLevel / 2;
+                    _weightMap[x, y] = weightMap[x, y] + Weight / 2 + WaterLevel / 2;
                     if (isRiversOn.isOn)
                     {
                         _riversMap[x, y] = riversMap[x, y];
@@ -139,7 +139,7 @@ namespace PerlinNoiseGenerator
             SetColor setColor;
             SetNoise setNoise;
             
-            switch (typeOfMap)
+            switch (CurrentTypeOfMap)
             {
                 case TypeOfMap.Island:
                     setColor = RenderIsland;
@@ -379,7 +379,7 @@ namespace PerlinNoiseGenerator
                 Vector2.Distance(new Vector2Int(0, _mapSizeY / 2), new Vector2Int(0, y)) /
                 Vector2.Distance(new Vector2Int(0, _mapSizeY / 2), new Vector2Int(0, 0));
 
-            return Mathf.Sqrt(Mathf.Pow(_myColorArray[2].Level - _noiseMap[x, y], 2)) * temperature + distanceFromEquator * temperature;
+            return Mathf.Sqrt(Mathf.Pow(_myColorArray[2].Level - _noiseMap[x, y], 2)) * Temperature + distanceFromEquator * Temperature;
         }
 
         //empty method for delegate
@@ -448,7 +448,7 @@ namespace PerlinNoiseGenerator
 
         private Color32 GetPixelColor(float noise, float weightNoise)
         {
-            if (noise < _myColorArray[0].Level + waterLevel)
+            if (noise < _myColorArray[0].Level + WaterLevel)
             {
                 if (weightNoise < 0.3)
                 {
@@ -463,7 +463,7 @@ namespace PerlinNoiseGenerator
                 return _myColorArray[0].Color;
             }
 
-            if (noise < _myColorArray[1].Level + waterLevel)
+            if (noise < _myColorArray[1].Level + WaterLevel)
             {
                 if (weightNoise < 0.5)
                 {
