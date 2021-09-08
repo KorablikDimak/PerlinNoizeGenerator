@@ -5,6 +5,7 @@ namespace PerlinNoiseGenerator
 {
     public class UIController : MonoBehaviour
     {
+        [SerializeField] private Rotator rotator;
         [SerializeField] private NoiseMapGenerator noiseMapGenerator;
         [SerializeField] private NoiseMapRenderer noiseMapRenderer;
         [SerializeField] private Button generateButton;
@@ -13,7 +14,6 @@ namespace PerlinNoiseGenerator
         [SerializeField] private Slider sliderGroundLevel;
         [SerializeField] private Slider sliderWaterLevel;
         [SerializeField] private InputField inputField;
-        [SerializeField] private Toggle toggle;
         [SerializeField] private Dropdown dropdownMapSize;
         [SerializeField] private Dropdown dropdownTypeOfMap;
         [SerializeField] private Dropdown dropdownTypeOfRender;
@@ -43,13 +43,14 @@ namespace PerlinNoiseGenerator
             sliderRotateSpeed.minValue = 0;
             sliderRotateSpeed.maxValue = 1;
             sliderRotateSpeed.value = 0.6f;
-            
-            sliderTemperature.onValueChanged.AddListener(delegate { TemperatureChange(); });
-            sliderWeight.onValueChanged.AddListener(delegate { WeightChange(); });
-            sliderGroundLevel.onValueChanged.AddListener(delegate { GroundLevelChange(); });
-            sliderWaterLevel.onValueChanged.AddListener(delegate { WaterLevelChange(); });
-            sliderRotateSpeed.onValueChanged.AddListener(delegate { RotateSpeedChange(); });
+
+            sliderTemperature.onValueChanged.AddListener(delegate { TemperatureChanged(); });
+            sliderWeight.onValueChanged.AddListener(delegate { WeightChanged(); });
+            sliderGroundLevel.onValueChanged.AddListener(delegate { GroundLevelChanged(); });
+            sliderWaterLevel.onValueChanged.AddListener(delegate { WaterLevelChanged(); });
+            sliderRotateSpeed.onValueChanged.AddListener(delegate { RotateSpeedChanged(); });
             rotateSpeedValue.text = $"{(int) (sliderRotateSpeed.value * 30)} град/с";
+            rotator.rotateSpeed = sliderRotateSpeed.value;
         }
 
         private static void AppCloseButtonClicked()
@@ -84,33 +85,32 @@ namespace PerlinNoiseGenerator
                 _ => noiseMapRenderer.typeOfMap
             };
 
-            noiseMapRenderer.rivers = toggle.isOn;
             noiseMapGenerator.seed = inputField.text.GetHashCode();
             StartCoroutine(noiseMapGenerator.GenerateAll());
         }
 
-        private void RotateSpeedChange()
+        private void RotateSpeedChanged()
         {
-            noiseMapGenerator.rotateSpeed = sliderRotateSpeed.value;
+            rotator.rotateSpeed = sliderRotateSpeed.value;
             rotateSpeedValue.text = $"{(int) (sliderRotateSpeed.value * 30)} град/с";
         }
 
-        private void TemperatureChange()
+        private void TemperatureChanged()
         {
             noiseMapRenderer.temperature = sliderTemperature.value;
         }
         
-        private void WeightChange()
+        private void WeightChanged()
         {
             noiseMapRenderer.weight = sliderWeight.value;
         }
         
-        private void GroundLevelChange()
+        private void GroundLevelChanged()
         {
             noiseMapRenderer.groundLevel = sliderGroundLevel.value;
         }
         
-        private void WaterLevelChange()
+        private void WaterLevelChanged()
         {
             noiseMapRenderer.waterLevel = sliderWaterLevel.value;
         }

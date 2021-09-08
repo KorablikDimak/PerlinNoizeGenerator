@@ -13,7 +13,8 @@ namespace PerlinNoiseGenerator
         [SerializeField] private LoadIndicator loadIndicator;
         [SerializeField] private Button saveButton;
         [SerializeField] private Canvas saveCanvas;
-        public new Renderer renderer;
+        [SerializeField] private Material mainMaterial;
+        [SerializeField] private Toggle isRiversOn;
         private readonly MyColor[] _myColorArray = new MyColor[7];
         private readonly MyColor[] _myColorWeightArray = new MyColor[7];
         private readonly MyColor[] _myColorTemperatureArray = new MyColor[7];
@@ -29,13 +30,6 @@ namespace PerlinNoiseGenerator
         private Texture2D _heightTexture2D;
         private delegate Color32 SetColor(int x, int y);
         private delegate void SetNoise(int x, int y);
-        
-        //config:
-        private const float NormalScale = 0.62f;
-        private const float HeightScale = 0.03f;
-        private const float UpAll = 0.05f;
-        private const float DownCoast = 1.6f;
-        private const float Speed = 2.5f;
 
         //player will change this:
         public float temperature;
@@ -43,7 +37,6 @@ namespace PerlinNoiseGenerator
         public TypeOfMap typeOfMap;
         public float groundLevel;
         public float waterLevel;
-        public bool rivers;
 
         public enum TypeOfMap
         {
@@ -101,7 +94,7 @@ namespace PerlinNoiseGenerator
             saveCanvas.enabled = true;
         }
 
-        public IEnumerator RendererNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
+        public IEnumerator RenderNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
         {
             _mapSizeX = noiseMap.GetLength(0);
             _mapSizeY = noiseMap.GetLength(1);
@@ -109,7 +102,7 @@ namespace PerlinNoiseGenerator
             _temperatureMap = new float[_mapSizeX, _mapSizeY];
             _weightMap = new float[_mapSizeX, _mapSizeY];
             _noiseMap = new float[_mapSizeX, _mapSizeY];
-            if (rivers)
+            if (isRiversOn.isOn)
             {
                 _riversMap = new float[_mapSizeX, _mapSizeY];
             }
@@ -119,9 +112,9 @@ namespace PerlinNoiseGenerator
                 for (int y = 0; y < _mapSizeY; y++)
                 {
                     _noiseMap[x, y] = noiseMap[x, y] + groundLevel;
-                    _temperatureMap[x, y] = TemperatureNoiseCreate(x, y);
+                    _temperatureMap[x, y] = CreateTemperatureNoise(x, y);
                     _weightMap[x, y] = weightMap[x, y] + weight / 2 + waterLevel / 2;
-                    if (rivers)
+                    if (isRiversOn.isOn)
                     {
                         _riversMap[x, y] = riversMap[x, y];
                     }
@@ -130,11 +123,13 @@ namespace PerlinNoiseGenerator
             
             loadIndicator.SetText("генерация рек и ландщафта");
             loadIndicator.AddProgress(0.3f);
-            SwitchTypeOfMap();
             yield return null;
             
+            SwitchTypeOfMap();
             loadIndicator.SetText("установка шейдеров");
             loadIndicator.AddProgress(0.2f);
+            yield return null;
+            
             SetShaders();
             yield return null;
         }
@@ -147,22 +142,22 @@ namespace PerlinNoiseGenerator
             switch (typeOfMap)
             {
                 case TypeOfMap.Island:
-                    setColor = IslandRender;
-                    setNoise = IslandCreate;
+                    setColor = RenderIsland;
+                    setNoise = CreateIsland;
                     SetPixelsToTexture(setColor, setNoise);
                     break;
                 case TypeOfMap.Temperature:
-                    setColor = TemperatureRender;
+                    setColor = RenderTemperature;
                     SetPixelsToTexture(setColor);
                     break;
                 case TypeOfMap.Coast:
-                    setColor = CoastRender;
-                    setNoise = CoastCreate;
+                    setColor = RenderCoast;
+                    setNoise = CreateCoast;
                     SetPixelsToTexture(setColor, setNoise);
                     break;
                 case TypeOfMap.Simple:
-                    setColor = SimpleRender;
-                    setNoise = SimpleCreate;
+                    setColor = RenderSimple;
+                    setNoise = CreateSimple;
                     SetPixelsToTexture(setColor, setNoise);
                     //create polar hats
                     for (int x = 0; x < _mapSizeX; x++)
@@ -177,11 +172,11 @@ namespace PerlinNoiseGenerator
                     }
                     break;
                 case TypeOfMap.Height:
-                    setColor = HeightRender;
+                    setColor = RenderHeight;
                     SetPixelsToTexture(setColor);
                     break;
                 case TypeOfMap.Weight:
-                    setColor = WeightRender;
+                    setColor = RenderWeight;
                     SetPixelsToTexture(setColor);
                     break;
                 default:
@@ -191,8 +186,8 @@ namespace PerlinNoiseGenerator
 
         private void SetShaders()
         {
-            renderer.sharedMaterial.EnableKeyword("_NORMALMAP");
-            renderer.sharedMaterial.EnableKeyword("_PARALLAXMAP");
+            mainMaterial.EnableKeyword("_NORMALMAP");
+            mainMaterial.EnableKeyword("_PARALLAXMAP");
             
             SetMainTexture();
             SetHeightMap();
@@ -202,7 +197,7 @@ namespace PerlinNoiseGenerator
         private void SetMainTexture()
         {
             _texture2D.Apply();
-            renderer.sharedMaterial.mainTexture = _texture2D;
+            mainMaterial.mainTexture = _texture2D;
         }
 
         private void SetHeightMap()
@@ -219,8 +214,8 @@ namespace PerlinNoiseGenerator
             _heightTexture2D = new Texture2D(_mapSizeX, _mapSizeY);
             _heightTexture2D.SetPixels(colorsMap);
             _heightTexture2D.Apply();
-            renderer.sharedMaterial.SetFloat("_Parallax", HeightScale);
-            renderer.sharedMaterial.SetTexture("_ParallaxMap", _heightTexture2D);
+            mainMaterial.SetFloat("_Parallax", NoiseMapRendererConfig.HeightScale);
+            mainMaterial.SetTexture("_ParallaxMap", _heightTexture2D);
         }
 
         private void SetNormalMap()
@@ -228,8 +223,8 @@ namespace PerlinNoiseGenerator
             //normals map for shader
             _normalTexture2D = NormalMapGenerator.CreateNormalMap(_noiseMap, _mapSizeX, _mapSizeY);
             _normalTexture2D.Apply();
-            renderer.sharedMaterial.SetFloat("_BumpScale", NormalScale);
-            renderer.sharedMaterial.SetTexture("_BumpMap", _normalTexture2D);
+            mainMaterial.SetFloat("_BumpScale", NoiseMapRendererConfig.NormalScale);
+            mainMaterial.SetTexture("_BumpMap", _normalTexture2D);
         }
 
         private List<River> CreateRivers()
@@ -327,7 +322,7 @@ namespace PerlinNoiseGenerator
         {
             var colorsMap = new Color[_mapSizeX * _mapSizeY];
             
-            if (rivers)
+            if (isRiversOn.isOn)
             {
                 CreateRivers();
             }
@@ -356,7 +351,7 @@ namespace PerlinNoiseGenerator
             });
 
             List<River> riversList = new List<River>();
-            if (rivers)
+            if (isRiversOn.isOn)
             {
                 riversList = CreateRivers();
             }
@@ -371,14 +366,14 @@ namespace PerlinNoiseGenerator
 
             _texture2D.SetPixels(colorsMap);
 
-            if (!rivers) return;
+            if (!isRiversOn.isOn) return;
             foreach (var position in riversList.SelectMany(river => river.Positions))
             {
                 _texture2D.SetPixel(position.x, position.y, _myColorArray[1].Color);
             }
         }
         
-        private float TemperatureNoiseCreate(int x, int y)
+        private float CreateTemperatureNoise(int x, int y)
         {
             float distanceFromEquator =
                 Vector2.Distance(new Vector2Int(0, _mapSizeY / 2), new Vector2Int(0, y)) /
@@ -388,52 +383,52 @@ namespace PerlinNoiseGenerator
         }
 
         //empty method for delegate
-        private void SimpleCreate(int x, int y) { }
+        private void CreateSimple(int x, int y) { }
 
-        private Color32 SimpleRender(int x, int y)
+        private Color32 RenderSimple(int x, int y)
         {
             return GetPixelColor(_noiseMap[x, y], _weightMap[x, y] + _temperatureMap[x, y] / 2);
         }
 
-        private void IslandCreate(int x, int y)
+        private void CreateIsland(int x, int y)
         {
             float distanceToCenter = 
                 Vector2Int.Distance(new Vector2Int(_mapSizeX / 2, _mapSizeY / 2), new Vector2Int(x, y)) / 
                 Vector2Int.Distance(new Vector2Int(_mapSizeX / 2, _mapSizeY / 2), new Vector2Int(0, 0));
                 
-            _noiseMap[x, y] = (_noiseMap[x, y] + UpAll) * (1 - DownCoast * Mathf.Pow(distanceToCenter, Speed));
+            _noiseMap[x, y] = (_noiseMap[x, y] + NoiseMapRendererConfig.UpAll) * (1 - NoiseMapRendererConfig.DownCoast * Mathf.Pow(distanceToCenter, NoiseMapRendererConfig.Speed));
         }
 
-        private Color32 IslandRender(int x, int y)
+        private Color32 RenderIsland(int x, int y)
         {
             return GetPixelColor(_noiseMap[x, y], _weightMap[x, y]);
         }
 
-        private void CoastCreate(int x, int y)
+        private void CreateCoast(int x, int y)
         {
             float distanceToCenter = 
                 Vector2Int.Distance(new Vector2Int(_mapSizeX, _mapSizeY), new Vector2Int(x, y)) / 
                 Vector2Int.Distance(new Vector2Int(_mapSizeX, _mapSizeY), new Vector2Int(0, 0));
                 
-            _noiseMap[x, y] = (_noiseMap[x, y] + UpAll) * (1 - DownCoast * Mathf.Pow(distanceToCenter, Speed));
+            _noiseMap[x, y] = (_noiseMap[x, y] + NoiseMapRendererConfig.UpAll) * (1 - NoiseMapRendererConfig.DownCoast * Mathf.Pow(distanceToCenter, NoiseMapRendererConfig.Speed));
         }
 
-        private Color32 CoastRender(int x, int y)
+        private Color32 RenderCoast(int x, int y)
         {
             return GetPixelColor(_noiseMap[x, y], _weightMap[x, y]);
         }
 
-        private Color32 WeightRender(int x, int y)
+        private Color32 RenderWeight(int x, int y)
         {
             return GetPixelColor(_weightMap[x, y] + _temperatureMap[x, y] / 2, _myColorWeightArray);
         }
 
-        private Color32 TemperatureRender(int x, int y)
+        private Color32 RenderTemperature(int x, int y)
         {
             return GetPixelColor(_temperatureMap[x, y], _myColorTemperatureArray);
         }
 
-        private Color32 HeightRender(int x, int y)
+        private Color32 RenderHeight(int x, int y)
         {
             return GetPixelColor(_noiseMap[x, y], _myColorHeightArray);
         }
