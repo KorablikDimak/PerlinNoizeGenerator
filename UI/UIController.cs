@@ -33,18 +33,27 @@ namespace PerlinNoiseGenerator.UI
             sliderTemperature.minValue = 0;
             sliderTemperature.maxValue = 2;
             sliderTemperature.value = 0.6f;
+            noiseMapRenderer.Temperature = sliderTemperature.value;
+            
             sliderWeight.minValue = 0;
             sliderWeight.maxValue = 1;
             sliderWeight.value = 0.66f;
+            noiseMapRenderer.Weight = sliderWeight.value;
+            
             sliderGroundLevel.minValue = -0.5f;
             sliderGroundLevel.maxValue = 0.5f;
             sliderGroundLevel.value = 0;
+            noiseMapRenderer.GroundLevel = sliderGroundLevel.value;
+            
             sliderWaterLevel.minValue = 0;
             sliderWaterLevel.maxValue = 0.5f;
             sliderWaterLevel.value = 0;
+            noiseMapRenderer.WaterLevel = sliderWaterLevel.value;
+            
             sliderRotateSpeed.minValue = 0;
             sliderRotateSpeed.maxValue = 1;
             sliderRotateSpeed.value = 0.6f;
+            rotator.RotateSpeed = sliderRotateSpeed.value;
 
             sliderTemperature.onValueChanged.AddListener(delegate { TemperatureChanged(); });
             sliderWeight.onValueChanged.AddListener(delegate { WeightChanged(); });
@@ -52,7 +61,6 @@ namespace PerlinNoiseGenerator.UI
             sliderWaterLevel.onValueChanged.AddListener(delegate { WaterLevelChanged(); });
             sliderRotateSpeed.onValueChanged.AddListener(delegate { RotateSpeedChanged(); });
             rotateSpeedValue.text = $"{(int) (sliderRotateSpeed.value * 30)} град/с";
-            rotator.RotateSpeed = sliderRotateSpeed.value;
         }
 
         private static void AppCloseButtonClicked()
