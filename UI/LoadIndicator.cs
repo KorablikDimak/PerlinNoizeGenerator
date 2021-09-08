@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.UI
 {
     public class LoadIndicator : MonoBehaviour
     {

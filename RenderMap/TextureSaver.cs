@@ -1,7 +1,7 @@
-using UnityEngine;
 using System.IO;
+using UnityEngine;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.RenderMap
 {
     public static class TextureSaver
     {

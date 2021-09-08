@@ -1,8 +1,8 @@
 using System.Threading;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.MapGen
 {
-    public class PlaneMapsGenerator : IMapsGenerator
+    public class SphereMapsGenerator : IMapsGenerator
     {
         public int MapSizeX { get; }
         public int MapSizeY { get; }
@@ -13,7 +13,7 @@ namespace PerlinNoiseGenerator
         public float[,] WeightMap { get; set; }
         public float[,] RiversMap { get; set; }
 
-        public PlaneMapsGenerator(int mapSizeX, int mapSizeY, float scale, int seed, bool rivers)
+        public SphereMapsGenerator(int mapSizeX, int mapSizeY, float scale, int seed, bool rivers)
         {
             MapSizeX = mapSizeX;
             MapSizeY = mapSizeY;
@@ -34,29 +34,27 @@ namespace PerlinNoiseGenerator
                    thread2.ThreadState != ThreadState.Stopped ||
                    thread3.ThreadState != ThreadState.Stopped)
             {
-                Thread.Sleep(50);
+                Thread.Sleep(100);
             }
         }
         
         private void CreateNoiseMap()
         {
-            NoiseMap = new float[MapSizeX, MapSizeY];
-            NoiseMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 5, Seed,
-                    NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance, NoiseGenConfig.Lacunarity);
+            float[,] noiseMap = Simplex.GenerateNoiseMap(MapSizeX, MapSizeY, Scale, NoiseGenConfig.Octaves, Seed);
+            NoiseMap = TransformSphereMap.TransformNoiseMap(noiseMap, MapSizeX, MapSizeY);
         }
-
+        
         private void CreateWeightMap()
         {
-            WeightMap = new float[MapSizeX, MapSizeY];
-            WeightMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 5, Seed + 1,
-                    NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance, NoiseGenConfig.Lacunarity);
+            float[,] weightMap = Simplex.GenerateNoiseMap(MapSizeX, MapSizeY, Scale, NoiseGenConfig.Octaves, Seed + 1);
+            WeightMap = TransformSphereMap.TransformNoiseMap(weightMap, MapSizeX, MapSizeY);
         }
-
+        
         private void CreateRiversMap()
         {
             if (!Rivers) return;
-            RiversMap = new float[MapSizeX, MapSizeY];
-            RiversMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 3, Seed + 2, NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance - 1, NoiseGenConfig.Lacunarity);
+            float[,] riversMap = Noise.GenerateNoiseMap(MapSizeX * 4, MapSizeY * 4, Scale + 3, Seed + 2, NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance - 1, NoiseGenConfig.Lacunarity);
+            RiversMap = TransformSphereMap.TransformNoiseMap(riversMap, MapSizeX, MapSizeY);
         }
     }
 }

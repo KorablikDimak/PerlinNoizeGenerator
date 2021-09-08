@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.UI
 {
     public class HelpCanvas : MonoBehaviour
     {

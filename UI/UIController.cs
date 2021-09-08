@@ -1,7 +1,9 @@
+using PerlinNoiseGenerator.MapGen;
+using PerlinNoiseGenerator.RenderMap;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.UI
 {
     public class UIController : MonoBehaviour
     {

@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using PerlinNoiseGenerator.RenderMap;
+using PerlinNoiseGenerator.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.MapGen
 {
     public class NoiseMapGenerator : MonoBehaviour
     {

@@ -1,8 +1,9 @@
 using System.Collections;
+using PerlinNoiseGenerator.MapGen;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.RenderMap
 {
     public class Rotator : MonoBehaviour
     {

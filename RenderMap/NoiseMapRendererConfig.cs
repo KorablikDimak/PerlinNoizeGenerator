@@ -1,4 +1,4 @@
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.RenderMap
 {
     public struct NoiseMapRendererConfig
     {

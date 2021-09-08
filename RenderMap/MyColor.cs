@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.RenderMap
 {
     public readonly struct MyColor
     {

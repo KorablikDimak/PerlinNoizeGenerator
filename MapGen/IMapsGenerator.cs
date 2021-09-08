@@ -1,4 +1,4 @@
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.MapGen
 {
     public interface IMapsGenerator
     {

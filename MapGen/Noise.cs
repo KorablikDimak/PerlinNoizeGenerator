@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.MapGen
 {
     public static class Noise
     {

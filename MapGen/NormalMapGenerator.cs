@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PerlinNoiseGenerator
+namespace PerlinNoiseGenerator.MapGen
 {
     public static class NormalMapGenerator
     {
@@ -8,8 +8,7 @@ namespace PerlinNoiseGenerator
         {
             var normalTexture = new Texture2D(mapSizeX, mapSizeY);
             float topLeft, top, topRight, right, downRight, down, downLeft, left;
-            var normalVector = new Vector3();
-            normalVector.z = 1;
+            var normalVector = new Vector3 {z = 1};
 
             var noiseMapWithFrame = new float[mapSizeX + 2][];
             for (int index = 0; index < mapSizeX + 2; index++)
