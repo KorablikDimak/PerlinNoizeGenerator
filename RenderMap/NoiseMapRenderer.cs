@@ -245,7 +245,7 @@ namespace PerlinNoiseGenerator.RenderMap
                     if (riversList.Count < _mapSizeX && riversList.Count < 400)
                     {
                         var riverToAdd = new River();
-                        if (riverToAdd.RiverGen(new Vector2Int(x, y), _noiseMap, _myColorArray[1].Level))
+                        if (riverToAdd.RiverGen(new Vector2Int(x, y), _noiseMap, _myColorArray[1].Level - GroundLevel + WaterLevel))
                         {
                             riversList.Add(riverToAdd);
                         }
