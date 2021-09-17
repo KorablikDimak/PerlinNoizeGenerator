@@ -1,12 +1,11 @@
 using UnityEngine;
 
-namespace PerlinNoiseGenerator.MapGen
+namespace PerlinNoiseGenerator.RenderMap.Shader
 {
     public static class NormalMapGenerator
     {
-        public static Texture2D CreateNormalMap(float[,] noiseMap, int mapSizeX, int mapSizeY)
+        public static Texture2D CreateNormalMap(Texture2D normalTexture, float[,] noiseMap, int mapSizeX, int mapSizeY)
         {
-            var normalTexture = new Texture2D(mapSizeX, mapSizeY);
             float topLeft, top, topRight, right, downRight, down, downLeft, left;
             var normalVector = new Vector3 {z = 1};
 

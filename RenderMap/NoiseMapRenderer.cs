@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using PerlinNoiseGenerator.MapGen;
+using PerlinNoiseGenerator.RenderMap.Shader;
 using PerlinNoiseGenerator.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -100,7 +100,11 @@ namespace PerlinNoiseGenerator.RenderMap
         {
             _mapSizeX = noiseMap.GetLength(0);
             _mapSizeY = noiseMap.GetLength(1);
+            
             _texture2D = new Texture2D(_mapSizeX, _mapSizeY);
+            _heightTexture2D = new Texture2D(_mapSizeX, _mapSizeY);
+            _normalTexture2D = new Texture2D(_mapSizeX, _mapSizeY);
+            
             _temperatureMap = new float[_mapSizeX, _mapSizeY];
             _weightMap = new float[_mapSizeX, _mapSizeY];
             _noiseMap = new float[_mapSizeX, _mapSizeY];
@@ -131,9 +135,18 @@ namespace PerlinNoiseGenerator.RenderMap
             loadIndicator.SetText("установка шейдеров");
             loadIndicator.AddProgress(0.2f);
             yield return null;
-            
-            SetShaders();
+
+            SetShader();
             yield return null;
+        }
+
+        private void SetShader()
+        {
+            ShaderCreator shaderCreator = new MyShaderCreator();
+            shaderCreator = new MainMap(shaderCreator, _texture2D, mainMaterial);
+            shaderCreator = new HeightMap(shaderCreator, _heightTexture2D, mainMaterial, _noiseMap);
+            shaderCreator = new NormalMap(shaderCreator, _normalTexture2D, mainMaterial, _noiseMap);
+            shaderCreator.SetTexture();
         }
 
         private void SwitchTypeOfMap()
@@ -184,49 +197,6 @@ namespace PerlinNoiseGenerator.RenderMap
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void SetShaders()
-        {
-            mainMaterial.EnableKeyword("_NORMALMAP");
-            mainMaterial.EnableKeyword("_PARALLAXMAP");
-            
-            SetMainTexture();
-            SetHeightMap();
-            SetNormalMap();
-        }
-
-        private void SetMainTexture()
-        {
-            _texture2D.Apply();
-            mainMaterial.mainTexture = _texture2D;
-        }
-
-        private void SetHeightMap()
-        {
-            //heights map for shader
-            var colorsMap = new Color[_mapSizeX * _mapSizeY];
-            Parallel.For(0, _mapSizeX, x =>
-            {
-                for (int y = 0; y < _mapSizeY; y++)
-                {
-                    colorsMap[y * _mapSizeY + x] = Color.Lerp(Color.black, Color.white, _noiseMap[x, y]);
-                }
-            });
-            _heightTexture2D = new Texture2D(_mapSizeX, _mapSizeY);
-            _heightTexture2D.SetPixels(colorsMap);
-            _heightTexture2D.Apply();
-            mainMaterial.SetFloat("_Parallax", NoiseMapRendererConfig.HeightScale);
-            mainMaterial.SetTexture("_ParallaxMap", _heightTexture2D);
-        }
-
-        private void SetNormalMap()
-        {
-            //normals map for shader
-            _normalTexture2D = NormalMapGenerator.CreateNormalMap(_noiseMap, _mapSizeX, _mapSizeY);
-            _normalTexture2D.Apply();
-            mainMaterial.SetFloat("_BumpScale", NoiseMapRendererConfig.NormalScale);
-            mainMaterial.SetTexture("_BumpMap", _normalTexture2D);
         }
 
         private List<River> CreateRivers()
