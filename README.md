@@ -5,6 +5,7 @@ The project uses only one third-party library this is a **SimplexNoise**.
 The generator creates convincing-looking flat and spherical maps that can be customized as you wish by changing humidity, temperature, water level, etc.
 The generator was created using the unity 3d engine.
 ### Techniques used
+- pattern decorator (used in folder `Shader`
 - pattern strategy (used in class `NoiseMapGenerator`)
 - delegate substitution (used in class `NoiseMapRenderer`)
 - parallel computing, work with multithreading (used in many places)
