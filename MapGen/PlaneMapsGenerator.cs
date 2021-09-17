@@ -17,7 +17,7 @@ namespace PerlinNoiseGenerator.MapGen
         {
             MapSizeX = mapSizeX;
             MapSizeY = mapSizeY;
-            Scale = scale;
+            Scale = scale + 5;
             Seed = seed;
             Rivers = rivers;
         }
@@ -25,14 +25,14 @@ namespace PerlinNoiseGenerator.MapGen
         public void CreateNoiseMap()
         {
             NoiseMap = new float[MapSizeX, MapSizeY];
-            NoiseMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 5, Seed,
+            NoiseMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale, Seed,
                     NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance, NoiseGenConfig.Lacunarity);
         }
 
         public void CreateWeightMap()
         {
             WeightMap = new float[MapSizeX, MapSizeY];
-            WeightMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 5, Seed + 1,
+            WeightMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale, Seed + 1,
                     NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance, NoiseGenConfig.Lacunarity);
         }
 
@@ -40,7 +40,8 @@ namespace PerlinNoiseGenerator.MapGen
         {
             if (!Rivers) return;
             RiversMap = new float[MapSizeX, MapSizeY];
-            RiversMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 3, Seed + 2, NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance - 1, NoiseGenConfig.Lacunarity);
+            RiversMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale, Seed + 2, 
+                NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance - 1, NoiseGenConfig.Lacunarity);
         }
     }
 }

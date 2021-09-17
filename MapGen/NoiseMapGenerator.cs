@@ -72,17 +72,10 @@ namespace PerlinNoiseGenerator.MapGen
             SwitchMapsGenerator();
             yield return null;
 
-            _mapsGenerator = new SphereMapsGenerator(_mapSizeX, _mapSizeY, _scale, Seed, isRiversOn.isOn);
-            yield return null;
-            
             var thread1 = new Thread(_mapsGenerator.CreateNoiseMap);
             thread1.Start();
-            yield return null;
-            
             var thread2 = new Thread(_mapsGenerator.CreateWeightMap);
             thread2.Start();
-            yield return null;
-            
             var thread3 = new Thread(_mapsGenerator.CreateRiversMap);
             thread3.Start();
             loadIndicator.AddProgress(0.1f);
@@ -158,6 +151,7 @@ namespace PerlinNoiseGenerator.MapGen
                     planeRenderer.enabled = false;
                     sphereRenderer.enabled = true;
                     rotator.ThisTransform = noiseMapRenderer.transform;
+                    _mapsGenerator = new SphereMapsGenerator(_mapSizeX, _mapSizeY, _scale, Seed, isRiversOn.isOn);
                     break;
                 case TypeOfRenderer.Plane:
                     foreach (var rendererForPlane in renderersForPlane)
@@ -167,6 +161,7 @@ namespace PerlinNoiseGenerator.MapGen
                     planeRenderer.enabled = true;
                     sphereRenderer.enabled = false;
                     rotator.ThisTransform = planeRenderer.transform;
+                    _mapsGenerator = new PlaneMapsGenerator(_mapSizeX, _mapSizeY, _scale, Seed, isRiversOn.isOn);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
