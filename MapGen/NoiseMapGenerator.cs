@@ -20,7 +20,7 @@ namespace PerlinNoiseGenerator.MapGen
         [SerializeField] private Toggle isRiversOn;
         private IMapsGenerator _mapsGenerator;
         private Coroutine _rotateCoroutine;
-        private float _scale = 0.012f;
+        private float _scale;
         private int _mapSizeX;
         private int _mapSizeY;
         
