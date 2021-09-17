@@ -22,37 +22,21 @@ namespace PerlinNoiseGenerator.MapGen
             Rivers = rivers;
         }
 
-        public void GenerateMaps()
-        {
-            var thread1 = new Thread(CreateNoiseMap);
-            thread1.Start();
-            var thread2 = new Thread(CreateWeightMap);
-            thread2.Start();
-            var thread3 = new Thread(CreateRiversMap);
-            thread3.Start();
-            while (thread1.ThreadState != ThreadState.Stopped ||
-                   thread2.ThreadState != ThreadState.Stopped ||
-                   thread3.ThreadState != ThreadState.Stopped)
-            {
-                Thread.Sleep(50);
-            }
-        }
-        
-        private void CreateNoiseMap()
+        public void CreateNoiseMap()
         {
             NoiseMap = new float[MapSizeX, MapSizeY];
             NoiseMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 5, Seed,
                     NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance, NoiseGenConfig.Lacunarity);
         }
 
-        private void CreateWeightMap()
+        public void CreateWeightMap()
         {
             WeightMap = new float[MapSizeX, MapSizeY];
             WeightMap = Noise.GenerateNoiseMap(MapSizeX, MapSizeY, Scale + 5, Seed + 1,
                     NoiseGenConfig.Octaves + 12, NoiseGenConfig.Persistance, NoiseGenConfig.Lacunarity);
         }
 
-        private void CreateRiversMap()
+        public void CreateRiversMap()
         {
             if (!Rivers) return;
             RiversMap = new float[MapSizeX, MapSizeY];

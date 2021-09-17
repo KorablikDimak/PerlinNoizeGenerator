@@ -11,6 +11,8 @@ namespace PerlinNoiseGenerator.MapGen
         public float[,] RiversMap { get; set; }
         public bool Rivers { get; }
         
-        void GenerateMaps();
+        void CreateNoiseMap();
+        void CreateWeightMap();
+        void CreateRiversMap();
     }
 }
