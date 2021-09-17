@@ -30,4 +30,4 @@ You can also implement it into your game as a full-fledged module with the addit
 - reworking the algorithm for creating rivers to make them more realistic
 - creation of an ecosystem, fauna on the territory of the map
 ## Download
-You can download the archive with the attachment at the link [PerlinNoiseGenerator](https://disk.yandex.ru/d/VDPALLn3iGqzGw)
+You can download the archive with the attachment at the link [PerlinNoiseGenerator](https://disk.yandex.ru/d/3nNH6CzYn6H4kg)
