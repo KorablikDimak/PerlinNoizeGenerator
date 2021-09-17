@@ -5,7 +5,6 @@ using System.Threading;
 using PerlinNoiseGenerator.RenderMap;
 using PerlinNoiseGenerator.UI;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 using UnityEngine.UI;
 
 namespace PerlinNoiseGenerator.MapGen
