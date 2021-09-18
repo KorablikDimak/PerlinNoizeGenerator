@@ -24,7 +24,6 @@ namespace PerlinNoiseGenerator.MapGen
         private int _mapSizeX;
         private int _mapSizeY;
         
-        //player will change this:
         public int Seed { get; set; }
         public MapSize CurrentMapSize { get; set; }
         public TypeOfRenderer CurrentTypeOfRenderer { get; set; }
@@ -161,7 +160,7 @@ namespace PerlinNoiseGenerator.MapGen
                     planeRenderer.enabled = true;
                     sphereRenderer.enabled = false;
                     rotator.ThisTransform = planeRenderer.transform;
-                    _mapsGenerator = new PlaneMapsGenerator(_mapSizeX, _mapSizeY, _scale, Seed, isRiversOn.isOn);
+                    _mapsGenerator = new PlaneMapsGenerator(_mapSizeX, _mapSizeY, Seed, isRiversOn.isOn);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

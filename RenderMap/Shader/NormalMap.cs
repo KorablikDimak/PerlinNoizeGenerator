@@ -4,6 +4,13 @@ namespace PerlinNoiseGenerator.RenderMap.Shader
 {
     public class NormalMap : ShaderDecorator
     {
+        public NormalMap(ShaderCreator shaderCreator, Texture2D texture, Material material, float[,] noiseMap) : base(shaderCreator)
+        {
+            Texture = texture;
+            Material = material;
+            NoiseMap = noiseMap;
+        }
+        
         private void SetNormalMap()
         {
             int mapSizeX = NoiseMap.GetLength(0);
@@ -14,13 +21,6 @@ namespace PerlinNoiseGenerator.RenderMap.Shader
             Texture.Apply();
             Material.SetFloat("_BumpScale", NoiseMapRendererConfig.NormalScale);
             Material.SetTexture("_BumpMap", Texture);
-        }
-
-        public NormalMap(ShaderCreator shaderCreator, Texture2D texture, Material material, float[,] noiseMap) : base(shaderCreator)
-        {
-            Texture = texture;
-            Material = material;
-            NoiseMap = noiseMap;
         }
 
         public override void SetTexture()

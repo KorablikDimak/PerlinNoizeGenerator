@@ -5,6 +5,13 @@ namespace PerlinNoiseGenerator.RenderMap.Shader
 {
     public class HeightMap : ShaderDecorator
     {
+        public HeightMap(ShaderCreator shaderCreator, Texture2D texture, Material material, float[,] noiseMap) : base(shaderCreator)
+        {
+            Texture = texture;
+            Material = material;
+            NoiseMap = noiseMap;
+        }
+        
         private void SetHeightMap()
         {
             int mapSizeX = NoiseMap.GetLength(0);
@@ -23,13 +30,6 @@ namespace PerlinNoiseGenerator.RenderMap.Shader
             Texture.Apply();
             Material.SetFloat("_Parallax", NoiseMapRendererConfig.HeightScale);
             Material.SetTexture("_ParallaxMap", Texture);
-        }
-
-        public HeightMap(ShaderCreator shaderCreator, Texture2D texture, Material material, float[,] noiseMap) : base(shaderCreator)
-        {
-            Texture = texture;
-            Material = material;
-            NoiseMap = noiseMap;
         }
 
         public override void SetTexture()

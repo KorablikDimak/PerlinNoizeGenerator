@@ -33,7 +33,6 @@ namespace PerlinNoiseGenerator.RenderMap
         private delegate Color32 SetColor(int x, int y);
         private delegate void SetNoise(int x, int y);
 
-        //player will change this:
         public float Temperature { get; set; }
         public float Weight { get; set; }
         public TypeOfMap CurrentTypeOfMap { get; set; }
