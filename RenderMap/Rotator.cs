@@ -9,6 +9,7 @@ namespace PerlinNoiseGenerator.RenderMap
     {
         [SerializeField] private NoiseMapGenerator noiseMapGenerator;
         [SerializeField] private InputField inputField;
+        private Coroutine _rotateCoroutine;
         public float RotateSpeed { get; set; }
         public Transform ThisTransform { get; set; }
 
@@ -45,13 +46,28 @@ namespace PerlinNoiseGenerator.RenderMap
             }
         }
         
-        public IEnumerator RotateTransform()
+        public void StartRotation()
+        {
+            _rotateCoroutine = StartCoroutine(RotateTransform());
+        }
+
+        private IEnumerator RotateTransform()
         {
             while (true)
             {
                 ThisTransform.Rotate(0, RotateSpeed, 0);
                 yield return new WaitForSeconds(1f / 30f);
             }
+        }
+        
+        public void StopRotation()
+        {
+            if (_rotateCoroutine != null)
+            {
+                StopCoroutine(_rotateCoroutine);
+            }
+
+            ThisTransform.rotation = new Quaternion();
         }
     }
 }

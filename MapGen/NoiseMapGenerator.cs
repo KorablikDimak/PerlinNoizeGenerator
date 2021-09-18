@@ -19,7 +19,6 @@ namespace PerlinNoiseGenerator.MapGen
         [SerializeField] private List<Renderer> renderersForPlane;
         [SerializeField] private Toggle isRiversOn;
         private IMapsGenerator _mapsGenerator;
-        private Coroutine _rotateCoroutine;
         private float _scale;
         private int _mapSizeX;
         private int _mapSizeY;
@@ -62,7 +61,7 @@ namespace PerlinNoiseGenerator.MapGen
             loadIndicator.RemoveProgress();
             loadIndicator.SetText("генерация карт высот");
             loadIndicator.SetDefaultSprite();
-            StopRotation();
+            rotator.StopRotation();
             yield return null;
             
             SwitchMapSize();
@@ -98,17 +97,6 @@ namespace PerlinNoiseGenerator.MapGen
             yield return null;
         }
 
-        private void StopRotation()
-        {
-            if (_rotateCoroutine != null)
-            {
-                StopCoroutine(_rotateCoroutine);
-            }
-
-            noiseMapRenderer.transform.rotation = new Quaternion();
-            planeRenderer.transform.rotation = new Quaternion();
-        }
-        
         private void SwitchMapSize()
         {
             switch (CurrentMapSize)
@@ -170,7 +158,7 @@ namespace PerlinNoiseGenerator.MapGen
         private void RenderMap()
         {
             StartCoroutine(noiseMapRenderer.RenderNoiseMap(_mapsGenerator.NoiseMap, _mapsGenerator.WeightMap, _mapsGenerator.RiversMap));
-            _rotateCoroutine = StartCoroutine(rotator.RotateTransform());
+            rotator.StartRotation();
         }
     }
 }
