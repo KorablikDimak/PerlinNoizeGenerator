@@ -1,6 +1,6 @@
 # PerlinNoizeGenerator
 ## Description
-procedural world generator based on perlin noise and simplex noise.
+Procedural world generator based on perlin noise and simplex noise.
 The project uses only one third-party library this is a **SimplexNoise**.
 The generator creates convincing-looking flat and spherical maps that can be customized as you wish by changing humidity, temperature, water level, etc.
 The generator was created using the unity 3d engine.
