@@ -1,5 +1,8 @@
 namespace PerlinNoiseGenerator.MapGen
 {
+    /// <summary>
+    /// Includes methods for generating various maps that can be used to convert to textures.
+    /// </summary>
     public class SphereMapsGenerator : IMapsGenerator
     {
         private readonly int _mapSizeX;
@@ -11,6 +14,14 @@ namespace PerlinNoiseGenerator.MapGen
         public float[,] WeightMap { get; set; }
         public float[,] RiversMap { get; set; }
 
+        /// <summary>
+        /// Configuring the Noise Algorithm.
+        /// </summary>
+        /// <param name="mapSizeX">horizontal size in pixels</param>
+        /// <param name="mapSizeY">vertical size in pixels</param>
+        /// /// <param name="scale">number that determines at what distance to view the noisemap</param>
+        /// <param name="seed">random value for creating different cards</param>
+        /// <param name="rivers">determines whether rivers will be generated or not</param>
         public SphereMapsGenerator(int mapSizeX, int mapSizeY, float scale, int seed, bool rivers)
         {
             _mapSizeX = mapSizeX;
@@ -20,6 +31,9 @@ namespace PerlinNoiseGenerator.MapGen
             _rivers = rivers;
         }
 
+        /// <summary>
+        /// Creates a 2D array based on simplex noise.
+        /// </summary>
         public void CreateNoiseMap()
         {
             float[,] noiseMap = Simplex.GenerateNoiseMap(_mapSizeX, _mapSizeY, _scale, 
@@ -27,6 +41,9 @@ namespace PerlinNoiseGenerator.MapGen
             NoiseMap = TransformSphereMap.TransformNoiseMap(noiseMap, _mapSizeX, _mapSizeY);
         }
         
+        /// <summary>
+        /// Creates a 2D array based on simplex noise.
+        /// </summary>
         public void CreateWeightMap()
         {
             float[,] weightMap = Simplex.GenerateNoiseMap(_mapSizeX, _mapSizeY, _scale, 
@@ -34,6 +51,9 @@ namespace PerlinNoiseGenerator.MapGen
             WeightMap = TransformSphereMap.TransformNoiseMap(weightMap, _mapSizeX, _mapSizeY);
         }
         
+        /// <summary>
+        /// Creates a 2D array based on perlin noise.
+        /// </summary>
         public void CreateRiversMap()
         {
             if (!_rivers) return;

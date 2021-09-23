@@ -27,12 +27,18 @@ namespace PerlinNoiseGenerator.MapGen
         public MapSize CurrentMapSize { get; set; }
         public TypeOfRenderer CurrentTypeOfRenderer { get; set; }
         
+        /// <summary>
+        /// Variant of the final view of the map display.
+        /// </summary>
         public enum TypeOfRenderer
         {
             Plane,
             Sphere
         }
         
+        /// <summary>
+        /// The final size of the map, specified in pixels
+        /// </summary>
         public enum MapSize
         {
             Small,
@@ -56,6 +62,10 @@ namespace PerlinNoiseGenerator.MapGen
             StartCoroutine(loadIndicator.AsyncLoadingImage());
         }
 
+        /// <summary>
+        /// Creates textures and displays them based on the parameters specified by the user in UIController.
+        /// Do this method only in Coroutine so as not to freeze the program while the algorithm is running.
+        /// </summary>
         public IEnumerator GenerateAll()
         {
             loadIndicator.RemoveProgress();

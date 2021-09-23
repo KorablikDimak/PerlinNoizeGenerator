@@ -2,8 +2,22 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator.MapGen
 {
+    /// <summary>
+    /// Includes a perlin noise generation algorithm.
+    /// </summary>
     public static class Noise
     {
+        /// <summary>
+        /// Creates a 2D array which, when interpolated from black to white, can be perceived as perlin noise.
+        /// </summary>
+        /// <param name="mapSizeX">horizontal size in pixels</param>
+        /// <param name="mapSizeY">vertical size in pixels</param>
+        /// <param name="scale">number that determines at what distance to view the noisemap</param>
+        /// <param name="seed">random value for creating different cards</param>
+        /// <param name="octaves">the number of levels of detail you want you perlin noise to have</param>
+        /// <param name="persistance">number that determines how much each octave contributes to the overall shape</param>
+        /// <param name="lacunarity">number that determines how much detail is added or removed at each octave</param>
+        /// <returns>2D array of float in the range from 0 to 1</returns>
         public static float[,] GenerateNoiseMap
             (int mapSizeX, int mapSizeY, float scale, int seed, int octaves, float persistance, float lacunarity)
         {

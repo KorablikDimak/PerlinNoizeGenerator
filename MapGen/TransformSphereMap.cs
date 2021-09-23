@@ -2,8 +2,18 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator.MapGen
 {
+    /// <summary>
+    /// Includes converter from cube sweep to spherical noise map.
+    /// </summary>
     public static class TransformSphereMap
     {
+        /// <summary>
+        /// Converts a cube sweep to a spherical noise map.
+        /// </summary>
+        /// <param name="noiseMap">2d array of real numbers from 0 to 1 which need transform</param>
+        /// <param name="mapSizeX">horizontal size in pixels</param>
+        /// <param name="mapSizeY">vertical size in pixels</param>
+        /// <returns>2d array of real numbers from 0 to 1</returns>
         public static float[,] TransformNoiseMap(float[,] noiseMap, int mapSizeX, int mapSizeY)
         {
             var sourceNoiseMap = new float[mapSizeX * 4, mapSizeY * 3];

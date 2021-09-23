@@ -4,11 +4,22 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator.RenderMap
 {
+    /// <summary>
+    /// Contains methods for generating rivers.
+    /// </summary>
     public class River
     {
+        private const int MinLenght = 30;
         public List<Vector2Int> Positions { get; } = new List<Vector2Int>();
         public bool[,] IsRiverHere { get; private set; }
 
+        /// <summary>
+        /// Generates a river from a source point based on a heightmap.
+        /// </summary>
+        /// <param name="startPosition">the point on the map from which the river starts its generation</param>
+        /// <param name="noiseMap">2D array of float in the range from 0 to 1</param>
+        /// <param name="waterLevel">the level below which the generation of rivers stops</param>
+        /// <returns>return rivers which are longer than min lenght (30 pixels)</returns>
         public bool RiverGen(Vector2Int startPosition, float[,] noiseMap, float waterLevel)
         {
             if (startPosition.x == 0 || 
@@ -26,12 +37,15 @@ namespace PerlinNoiseGenerator.RenderMap
             Vector2Int preferPosition = FindLowest(startPosition.x, startPosition.y, noiseMap);
             FindPathToWater(startPosition, preferPosition, noiseMap, waterLevel);
 
-            return Positions.Count > 30;
+            return Positions.Count > MinLenght;
         }
 
+        /// <summary>
+        /// The rivers are wider towards the end.
+        /// </summary>
+        /// <param name="river">the river which must be widened at the end</param>
         public static void DigRiver(River river)
         {
-            //the rivers are wider towards the end 
             int countBeforeDigging = river.Positions.Count;
             for (int i = countBeforeDigging - 1; i >= countBeforeDigging / 1.6; i--)
             {

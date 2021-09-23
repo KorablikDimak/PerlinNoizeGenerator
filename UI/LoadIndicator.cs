@@ -12,6 +12,10 @@ namespace PerlinNoiseGenerator.UI
         [SerializeField] private Text loadingText;
         private float _progress;
 
+        /// <summary>
+        /// Refreshes the indicator every frame.
+        /// Do this method only in Coroutine so as not to freeze the program while the algorithm is running.
+        /// </summary>
         public IEnumerator AsyncLoadingImage()
         {
             while (true)
@@ -25,7 +29,7 @@ namespace PerlinNoiseGenerator.UI
         {
             loadingImage.sprite = checkMark;
         }
-
+        
         public void SetDefaultSprite()
         {
             loadingImage.sprite = defaultSprite;

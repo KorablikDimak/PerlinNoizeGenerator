@@ -39,6 +39,9 @@ namespace PerlinNoiseGenerator.RenderMap
         public float GroundLevel { get; set; }
         public float WaterLevel { get; set; }
 
+        /// <summary>
+        /// Finaly type of created map which characterise appearance.
+        /// </summary>
         public enum TypeOfMap
         {
             Island,
@@ -95,6 +98,13 @@ namespace PerlinNoiseGenerator.RenderMap
             saveCanvas.enabled = true;
         }
 
+        /// <summary>
+        /// Create all textures to game object.
+        /// Do this method only in Coroutine so as not to freeze the program while the algorithm is running.
+        /// </summary>
+        /// <param name="noiseMap">2D array of float in the range from 0 to 1</param>
+        /// <param name="weightMap">2D array of float in the range from 0 to 1</param>
+        /// <param name="riversMap">2D array of float in the range from 0 to 1</param>
         public IEnumerator RenderNoiseMap(float[,] noiseMap, float[,] weightMap, float[,] riversMap)
         {
             _mapSizeX = noiseMap.GetLength(0);

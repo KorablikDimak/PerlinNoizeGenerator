@@ -4,12 +4,22 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator.RenderMap
 {
+    /// <summary>
+    /// Contains a method for grouping intersecting rivers.
+    /// </summary>
     public class RiversGroup
     {
         public List<River> GroupOfRivers { get; } = new List<River>();
         private static int[,] Count { get; set; }
         private static List<Vector2Int> CrossPoints { get; set; }
 
+        /// <summary>
+        /// Recursively groups intersecting rivers.
+        /// </summary>
+        /// <param name="rivers">list of all rivers to be grouped</param>
+        /// <param name="mapSizeX">horizontal size of map in pixels</param>
+        /// <param name="mapSizeY">vertical size of map in pixels</param>
+        /// <returns>river groups</returns>
         public static List<RiversGroup> BuildRiversGroups(List<River> rivers, int mapSizeX, int mapSizeY)
         {
             var riversGroups = new List<RiversGroup>();

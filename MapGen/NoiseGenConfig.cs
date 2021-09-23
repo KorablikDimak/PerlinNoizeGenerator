@@ -1,8 +1,11 @@
 namespace PerlinNoiseGenerator.MapGen
 {
+    /// <summary>
+    /// Global constants for the generator.
+    /// The values are selected optimal so it is not recommended to change them in the source code.
+    /// </summary>
     public struct NoiseGenConfig
     {
-        //this is optimal but you can change this if you want
         public const int OctavesForSimplex = 10;
         public const int OctavesForNoise = 20;
         public const float Lacunarity = 0.72f;

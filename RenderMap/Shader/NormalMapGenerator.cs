@@ -2,11 +2,21 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator.RenderMap.Shader
 {
+    /// <summary>
+    /// Include method for normalise height map.
+    /// </summary>
     public static class NormalMapGenerator
     {
+        /// <summary>
+        /// Creates a normal map based on a noise map and a height map.
+        /// </summary>
+        /// <param name="normalTexture">the texture to be normalized</param>
+        /// <param name="noiseMap">2D array of float in the range from 0 to 1</param>
+        /// <param name="mapSizeX">horizontal size in pixels</param>
+        /// <param name="mapSizeY">vertical size in pixels</param>
+        /// <returns>normalised texture</returns>
         public static Texture2D CreateNormalMap(Texture2D normalTexture, float[,] noiseMap, int mapSizeX, int mapSizeY)
         {
-            float topLeft, top, topRight, right, downRight, down, downLeft, left;
             var normalVector = new Vector3 {z = 1};
 
             var noiseMapWithFrame = new float[mapSizeX + 2][];
@@ -42,14 +52,14 @@ namespace PerlinNoiseGenerator.RenderMap.Shader
             {
                 for (int y = 1; y < mapSizeY + 1; y++)
                 {
-                    topLeft = noiseMapWithFrame[x - 1][y + 1];
-                    top = noiseMapWithFrame[x][y + 1];
-                    topRight = noiseMapWithFrame[x + 1][y + 1];
-                    right = noiseMapWithFrame[x + 1][y];
-                    downRight = noiseMapWithFrame[x + 1][y - 1];
-                    down = noiseMapWithFrame[x][y - 1];
-                    downLeft = noiseMapWithFrame[x - 1][y - 1];
-                    left = noiseMapWithFrame[x - 1][y];
+                    var topLeft = noiseMapWithFrame[x - 1][y + 1];
+                    var top = noiseMapWithFrame[x][y + 1];
+                    var topRight = noiseMapWithFrame[x + 1][y + 1];
+                    var right = noiseMapWithFrame[x + 1][y];
+                    var downRight = noiseMapWithFrame[x + 1][y - 1];
+                    var down = noiseMapWithFrame[x][y - 1];
+                    var downLeft = noiseMapWithFrame[x - 1][y - 1];
+                    var left = noiseMapWithFrame[x - 1][y];
 
                     normalVector.x = -(downRight - downLeft + 2 * (right - left) + topRight - topLeft);
                     normalVector.y = -(topLeft - downLeft + 2 * (top - down) + topRight - downRight);

@@ -46,6 +46,9 @@ namespace PerlinNoiseGenerator.RenderMap
             }
         }
         
+        /// <summary>
+        /// Starts the rotation of the game object.
+        /// </summary>
         public void StartRotation()
         {
             _rotateCoroutine = StartCoroutine(RotateTransform());
@@ -60,6 +63,9 @@ namespace PerlinNoiseGenerator.RenderMap
             }
         }
         
+        /// <summary>
+        /// Stops the rotation of the game object.
+        /// </summary>
         public void StopRotation()
         {
             if (_rotateCoroutine != null)

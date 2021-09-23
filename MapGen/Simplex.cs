@@ -2,8 +2,20 @@ using UnityEngine;
 
 namespace PerlinNoiseGenerator.MapGen
 {
+    /// <summary>
+    /// Includes a simplex noise generation algorithm.
+    /// </summary>
     public static class Simplex
     {
+        /// <summary>
+        /// Create a cubic scan of simplex noise.
+        /// </summary>
+        /// <param name="mapSizeX">horizontal size in pixels</param>
+        /// <param name="mapSizeY">vertical size in pixels</param>
+        /// <param name="scale">number that determines at what distance to view the noisemap</param>
+        /// <param name="octaves">the number of levels of detail you want you perlin noise to have</param>
+        /// <param name="seed">random value for creating different cards</param>
+        /// <returns>2D array of float in the range from 0 to 1</returns>
         public static float[,] GenerateNoiseMap(int mapSizeX, int mapSizeY, float scale, int octaves, int seed)
         {
             var cubeMap = new float[mapSizeX * 4, mapSizeY * 4];

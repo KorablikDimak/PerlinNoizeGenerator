@@ -1,5 +1,9 @@
 namespace PerlinNoiseGenerator.RenderMap
 {
+    /// <summary>
+    /// Global constants for the generator.
+    /// The values are selected optimal so it is not recommended to change them in the source code.
+    /// </summary>
     public struct NoiseMapRendererConfig
     {
         public const float NormalScale = 0.62f;
