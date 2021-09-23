@@ -9,6 +9,7 @@ The generator was created using the unity 3d engine.
 - the `RenderMap` directory contains classes for creating and transforming textures
 - the `UI` directory contains all the classes related to the user interface
 - the `SimplexNoise` directory contains the only third-party library with simplex noise
+- detailed information can be found in the **documentation**
 ### Capability
 - maps are rendered reliably using generated normal and elevation maps
 - you can save created textures
