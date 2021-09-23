@@ -10,9 +10,7 @@ The generator was created using the unity 3d engine.
 - the `UI` directory contains all the classes related to the user interface
 - the `SimplexNoise` directory contains the only third-party library with simplex noise
 ### Techniques used
-- pattern decorator (used in folder `Shader`
-- pattern strategy (used in class `NoiseMapGenerator`)
-- delegate substitution (used in class `NoiseMapRenderer`)
+- pattern decorator (used in folder `Shader`)
 - parallel computing, work with multithreading (used in many places)
 - coroutines as a replacement for asynchronous unity methods (aslo used in many places)
 ### Capability
