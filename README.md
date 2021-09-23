@@ -1,6 +1,6 @@
 # PerlinNoizeGenerator
 ## Description
-procedural world generator based on perlin noise and simplex noise.
+Procedural world generator based on perlin noise and simplex noise.
 The project uses only one third-party library this is a **SimplexNoise**.
 The generator creates convincing-looking flat and spherical maps that can be customized as you wish by changing humidity, temperature, water level, etc.
 The generator was created using the unity 3d engine.
@@ -9,12 +9,6 @@ The generator was created using the unity 3d engine.
 - the `RenderMap` directory contains classes for creating and transforming textures
 - the `UI` directory contains all the classes related to the user interface
 - the `SimplexNoise` directory contains the only third-party library with simplex noise
-### Techniques used
-- pattern decorator (used in folder `Shader`
-- pattern strategy (used in class `NoiseMapGenerator`)
-- delegate substitution (used in class `NoiseMapRenderer`)
-- parallel computing, work with multithreading (used in many places)
-- coroutines as a replacement for asynchronous unity methods (aslo used in many places)
 ### Capability
 - maps are rendered reliably using generated normal and elevation maps
 - you can save created textures
